@@ -1,17 +1,29 @@
 #package(default_visibility = ["//visibility:public"])
 
-cc_binary(
+cc_library(
     name = "my_cpp",
     srcs = ["my.cpp"],
 )
 
-cc_binary(
+cc_library(
     name = "std_cpp",
     srcs = ["std.cpp"],
 )
 
-#py_binary(
-#    name = "",
-#    srcs = [],
-#    deps = [],
-#)
+cc_library(
+    name = "gen",
+    srcs = ["gen.cc"],
+    hdrs = ["gen.h"],
+    deps = ["//:cf"],
+)
+
+cc_test(
+    name = "runner",
+    srcs = ["runner.cc"],
+    deps = [
+        ":gen",
+        ":my_cpp",
+        ":std_cpp",
+        "@benchmark//:benchmark_main",
+    ],
+)
