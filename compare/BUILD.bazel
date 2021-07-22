@@ -1,0 +1,17 @@
+#package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "my_cpp",
+    srcs = ["my.cpp"],
+)
+
+cc_binary(
+    name = "std_cpp",
+    srcs = ["std.cpp"],
+)
+
+#py_binary(
+#    name = "",
+#    srcs = [],
+#    deps = [],
+#)

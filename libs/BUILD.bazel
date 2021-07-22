@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+LIB_HDRS = [
+    "//libs/codeforces:testlib.h",
+]
+
+cc_library(
+    name = "all",
+    srcs = LIB_HDRS,
+)
