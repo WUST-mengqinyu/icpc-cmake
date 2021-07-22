@@ -1,10 +1,12 @@
 /*================================================================
 *
 *   创 建 者： badcw
-*   创建日期： 2020/10/31 14:06
+*   创建日期： 2021/7/22 4:48 下午
 *
 ================================================================*/
 #include <bits/stdc++.h>
+//#include "testlib.h"
+//#include "atcoder/all"
 
 #define VI vector<int>
 #define ll long long
@@ -39,7 +41,7 @@ namespace IO {
 using namespace IO;
 
 
-const int maxn = 2e5+50;
+const int maxn = 1e5+50;
 const int mod = 1e9+7;
 
 ll qp(ll a, ll n) {
@@ -66,73 +68,7 @@ ll qp(ll a, ll n, int mod) {
     return res;
 }
 
-int n, m;
-ll p[maxn << 2];
-int a[maxn], b[maxn];
+int main(int argc, char **agrv) {
 
-void update(int rt, int l, int r, int pos, int k) {
-    if (l == r) {
-        p[rt] = k;
-        return;
-    }
-    int mid = l + r >> 1;
-    if (pos <= mid) update(rt << 1, l, mid, pos, k);
-    else update(rt << 1 | 1, mid + 1, r, pos, k);
-    p[rt] = p[rt << 1] + p[rt << 1 | 1];
-}
-
-ll query(int rt, int l, int r, int le, int re) {
-    if (re == 0) return 0;
-    if (le <= l && r <= re) return p[rt];
-    ll sum = 0;
-    int mid = l + r >> 1;
-    if (le <= mid) sum += query(rt << 1, l, mid, le, re);
-    if (re > mid) sum += query(rt << 1 | 1, mid + 1, r, le, re);
-    return sum;
-}
-
-ll querypos(int rt, int l, int r, int pos) {
-    if (pos == 0) return 0;
-    if (l == r) return p[rt];
-    int mid = l + r >> 1;
-    if (pos <= mid) return querypos(rt << 1, l, mid, pos);
-    return querypos(rt << 1 | 1, mid + 1, r, pos);
-}
-
-void updatea(int pos, int x) {
-    ll tp = query(1, 1, n, 1, pos - 1);
-    if (x - tp > b[pos]) update(1, 1, n, pos, x - tp);
-    else update(1, 1, n, pos, b[pos]);
-    a[pos] = x;
-}
-
-void updateb(int pos, int x) {
-    ll tp = query(1, 1, n, 1, pos - 1);
-    if (x + tp < a[pos]) update(1, 1, n, pos, a[pos] - tp);
-    else update(1, 1, n, pos, x);
-    b[pos] = x;
-}
-
-int main(int argc, char* argv[]) {
-    R(n, m);
-    for (int i = 1; i <= n; ++i) {
-        R(a[i]);
-        updatea(i, a[i]);
-    }
-    for (int i = 1; i <= n; ++i) {
-        R(b[i]);
-        updateb(i, b[i]);
-    }
-    while (m--) {
-        int op, x, y;
-        R(op, x);
-        if (op == 3) {
-            W(query(1, 1, n, 1, x));
-        } else {
-            R(y);
-            if (op == 1) updatea(x, y);
-            else updateb(x, y);
-        }
-    }
     return 0;
 }

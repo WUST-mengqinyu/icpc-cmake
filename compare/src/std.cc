@@ -77,21 +77,8 @@ void updatec() {
 }
 
 int main(int argc, char* argv[]) {
-    int m;
-    R(n, m);
-    for (int i = 1; i <= n; ++i) R(a[i]);
-    for (int i = 1; i <= n; ++i) R(b[i]);
-    while (m--) {
-        updatec();
-        int op, x, y;
-        R(op, x);
-        if (op == 3) {
-            W(c[x]);
-        } else {
-            R(y);
-            if (op == 1) a[x] = y;
-            else b[x] = y;
-        }
-    }
+    int x, y;
+    cin >> x >> y;
+    cout << x + y << endl;
     return 0;
 }

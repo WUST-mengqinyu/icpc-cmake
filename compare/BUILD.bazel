@@ -1,17 +1,5 @@
-#package(default_visibility = ["//visibility:public"])
-
 cc_binary(
-    name = "my_cpp",
-    srcs = ["my.cpp"],
+    name = "gen",
+    srcs = ["gen.cc", "gen.h"],
+    deps = ["//:cf"],
 )
-
-cc_binary(
-    name = "std_cpp",
-    srcs = ["std.cpp"],
-)
-
-#py_binary(
-#    name = "",
-#    srcs = [],
-#    deps = [],
-#)

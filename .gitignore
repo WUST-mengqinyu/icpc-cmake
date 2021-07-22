@@ -1,2 +1,14 @@
+# bazel project
 bazel-*
 .clwb
+
+# binary files
+my
+std
+gen
+runner
+
+# data dir
+/compare/data/*.in
+/compare/data/*.out
+/compare/bin
