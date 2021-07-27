@@ -1,10 +1,12 @@
 /*================================================================
 *
 *   创 建 者： badcw
-*   创建日期： 2020/10/31 14:06
+*   创建日期： 2021/7/27 3:45 下午
 *
 ================================================================*/
 #include <bits/stdc++.h>
+//#include "testlib.h"
+//#include "atcoder/all"
 
 #define VI vector<int>
 #define ll long long
@@ -39,7 +41,7 @@ namespace IO {
 using namespace IO;
 
 
-const int maxn = 2e5+50;
+const int maxn = 1e5+50;
 const int mod = 1e9+7;
 
 ll qp(ll a, ll n) {
@@ -67,61 +69,80 @@ ll qp(ll a, ll n, int mod) {
 }
 
 int n, m;
-ll p[maxn << 2];
-int a[maxn], b[maxn];
+int vis[maxn], fa[maxn];
+int F(int x) {
+    return x == fa[x] ? x : fa[x] = F(fa[x]);
+}
 
-void update(int rt, int l, int r, int pos, int k) {
-    if (l == r) {
-        p[rt] = k;
-        return;
+struct edge {
+    int u, v, w;
+    bool operator < (const edge &oth) const {
+        return w < oth.w;
     }
-    int mid = l + r >> 1;
-    if (pos <= mid) update(rt << 1, l, mid, pos, k);
-    else update(rt << 1 | 1, mid + 1, r, pos, k);
-    p[rt] = p[rt << 1] + p[rt << 1 | 1];
-}
+};
 
-ll query(int rt, int l, int r, int le, int re) {
-    if (re == 0) return 0;
-    if (le <= l && r <= re) return p[rt];
-    ll sum = 0;
-    int mid = l + r >> 1;
-    if (le <= mid) sum += query(rt << 1, l, mid, le, re);
-    if (re > mid) sum += query(rt << 1 | 1, mid + 1, r, le, re);
-    return sum;
-}
-
-ll querypos(int rt, int l, int r, int pos) {
-    if (pos == 0) return 0;
-    if (l == r) return p[rt];
-    int mid = l + r >> 1;
-    if (pos <= mid) return querypos(rt << 1, l, mid, pos);
-    return querypos(rt << 1 | 1, mid + 1, r, pos);
-}
-
-void updatea(int pos, int x) {
-    ll tp = query(1, 1, n, 1, pos - 1);
-    if (x - tp > b[pos]) update(1, 1, n, pos, x - tp);
-    else update(1, 1, n, pos, b[pos]);
-    a[pos] = x;
-}
-
-void updateb(int pos, int x) {
-    ll tp = query(1, 1, n, 1, pos - 1);
-    if (x + tp < a[pos]) update(1, 1, n, pos, a[pos] - tp);
-    else update(1, 1, n, pos, x);
-    b[pos] = x;
-}
-
-int main(int argc, char* argv[]) {
-    int x, y;
-    cin >> x >> y;
-    vector<int> a(0);
-    for (int i = 0; i < 1e8; ++i) {
-        a.push_back(x);
-        if (a.size() > 1e5) a.pop_back();
+int main(int argc, char **agrv) {
+    int T; R(T);
+    for (int kase = 1; kase <= T; ++kase) {
+        R(n, m);
+        for (int i = 1; i <= n; ++i) {
+            fa[i] = i;
+            vis[i] = 0;
+        }
+        vector<edge> a;
+        for (int i = 0; i < m; ++i) {
+            int u, v, w;
+            R(u, v, w);
+            if (u == v) continue;
+            a.push_back({u, v, w});
+        }
+        int k; R(k);
+        for (int i = 0; i < k; ++i) {
+            int x; R(x);
+            vis[x] = 1;
+        }
+        vector<edge> b;
+        ll w = 0;
+        int tot = 0;
+        sort(a.begin(), a.end());
+        if (n == 2) {
+            if ((int)a.size() > 0) {
+                W(a[0].w);
+            } else W(-1);
+            continue;
+        }
+        for (auto &i : a) {
+            if (vis[i.u] || vis[i.v]) {
+                b.push_back(i);
+            } else {
+                int u = F(i.u);
+                int v = F(i.v);
+                if (u != v) {
+                    fa[u] = v;
+                    w += i.w;
+                    tot ++;
+//                    W(i.u, i.v, i.w);
+                }
+            }
+        }
+        if (tot != n - k - 1) W("Impossible");
+        else {
+            for (auto &i : b) {
+                if (vis[i.u] && vis[i.v]) {
+                    continue;
+                }
+                int u = F(i.u);
+                int v = F(i.v);
+                if (u != v) {
+                    fa[u] = v;
+                    w += i.w;
+                    tot++;
+//                W(i.u, i.v, i.w);
+                }
+            }
+            if (tot != n - 1) W("Impossible");
+            else W(w);
+        }
     }
-    x = a[y] + y;
-    cout << x << endl;
     return 0;
 }

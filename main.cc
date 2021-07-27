@@ -1,7 +1,7 @@
 /*================================================================
 *
 *   创 建 者： badcw
-*   创建日期： 2021/7/22 4:48 下午
+*   创建日期： 2021/7/27 3:45 下午
 *
 ================================================================*/
 #include <bits/stdc++.h>
@@ -68,7 +68,81 @@ ll qp(ll a, ll n, int mod) {
     return res;
 }
 
-int main(int argc, char **agrv) {
+int n, m;
+int vis[maxn], fa[maxn];
+int F(int x) {
+    return x == fa[x] ? x : fa[x] = F(fa[x]);
+}
 
+struct edge {
+    int u, v, w;
+    bool operator < (const edge &oth) const {
+        return w < oth.w;
+    }
+};
+
+int main(int argc, char **agrv) {
+    int T; R(T);
+    for (int kase = 1; kase <= T; ++kase) {
+        R(n, m);
+        for (int i = 1; i <= n; ++i) {
+            fa[i] = i;
+            vis[i] = 0;
+        }
+        vector<edge> a;
+        for (int i = 0; i < m; ++i) {
+            int u, v, w;
+            R(u, v, w);
+            if (u == v) continue;
+            a.push_back({u, v, w});
+        }
+        int k; R(k);
+        for (int i = 0; i < k; ++i) {
+            int x; R(x);
+            vis[x] = 1;
+        }
+        vector<edge> b;
+        ll w = 0;
+        int tot = 0;
+        sort(a.begin(), a.end());
+        if (n == 2) {
+            if ((int)a.size() > 0) {
+                W(a[0].w);
+            } else W(-1);
+            continue;
+        }
+        for (auto &i : a) {
+            if (vis[i.u] || vis[i.v]) {
+                b.push_back(i);
+            } else {
+                int u = F(i.u);
+                int v = F(i.v);
+                if (u != v) {
+                    fa[u] = v;
+                    w += i.w;
+                    tot ++;
+//                    W(i.u, i.v, i.w);
+                }
+            }
+        }
+        if (tot != n - k - 1) W("Impossible");
+        else {
+            for (auto &i : b) {
+                if (vis[i.u] && vis[i.v]) {
+                    continue;
+                }
+                int u = F(i.u);
+                int v = F(i.v);
+                if (u != v) {
+                    fa[u] = v;
+                    w += i.w;
+                    tot++;
+//                    W(i.u, i.v, i.w);
+                }
+            }
+            if (tot != n - 1) W("Impossible");
+            else W(w);
+        }
+    }
     return 0;
 }

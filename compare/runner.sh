@@ -22,4 +22,4 @@ bazel build src:runner && cp ../bazel-bin/compare/src/runner bin
 bazel build :gen && cp ../bazel-bin/compare/gen bin
 
 # run
-cd bin && ./runner
+cd bin && ./runner dbg "$2"
