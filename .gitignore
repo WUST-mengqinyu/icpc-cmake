@@ -8,6 +8,9 @@ std
 gen
 runner
 
+# main file
+main.cc
+
 # data dir
 /compare/data/*.in
 /compare/data/*.out

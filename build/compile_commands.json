@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/badcw/workspace/icpc-cmake/build",
+  "command": "/usr/bin/g++ -Dbadcw -I/home/badcw/workspace/icpc-cmake/. -g -std=gnu++20 -o CMakeFiles/main.dir/main.cc.o -c /home/badcw/workspace/icpc-cmake/main.cc",
+  "file": "/home/badcw/workspace/icpc-cmake/main.cc"
+}
+]
