@@ -17,3 +17,4 @@ main.cc
 /compare/bin
 build/
 cmake-build-debug/
+.cache/
