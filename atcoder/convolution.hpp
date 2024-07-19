@@ -247,7 +247,7 @@ std::vector<T> convolution(const std::vector<T>& a, const std::vector<T>& b) {
     for (int i = 0; i < m; i++) {
         b2[i] = mint(b[i]);
     }
-    auto c2 = convolution(move(a2), move(b2));
+    auto c2 = convolution(std::move(a2), std::move(b2));
     std::vector<T> c(n + m - 1);
     for (int i = 0; i < n + m - 1; i++) {
         c[i] = c2[i].val();
@@ -255,7 +255,7 @@ std::vector<T> convolution(const std::vector<T>& a, const std::vector<T>& b) {
     return c;
 }
 
-std::vector<long long> convolution_ll(const std::vector<long long>& a,
+inline std::vector<long long> convolution_ll(const std::vector<long long>& a,
                                       const std::vector<long long>& b) {
     int n = int(a.size()), m = int(b.size());
     if (!n || !m) return {};

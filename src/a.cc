@@ -42,7 +42,7 @@ int main(int argc, char **agrv) {
   int T; scanf("%d", &T);
   for (int kase = 1; kase <= T; ++kase) {
     int n;R(n);
-    W(inner::qp(5, n));
+    W(inner::qp(2, n));
   }
   return 0;
 }
