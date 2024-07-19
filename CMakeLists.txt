@@ -5,6 +5,9 @@ project(icpc)
 set(CMAKE_CXX_STANDARD 20)
 
 add_definitions(-Dbadcw)
+set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
+configure_file(consts.h.in ${CMAKE_CURRENT_SOURCE_DIR}/consts.h @ONLY)
+
 add_executable(main main.cc testlib.h)
 include_directories(.)
 

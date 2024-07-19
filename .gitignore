@@ -19,3 +19,4 @@ build/
 cmake-build-debug/
 .cache/
 .idea/
+consts.h

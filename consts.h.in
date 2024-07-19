@@ -1,0 +1,7 @@
+#ifndef CONSTS_H_IN
+#define CONSTS_H_IN
+
+#include <string>
+const std::string PROJECT_DIR = "@PROJECT_DIR@";
+
+#endif
