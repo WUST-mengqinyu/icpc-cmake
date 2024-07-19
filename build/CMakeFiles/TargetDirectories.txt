@@ -1,3 +1,0 @@
-/home/badcw/workspace/icpc-bazel/build/CMakeFiles/main.dir
-/home/badcw/workspace/icpc-bazel/build/CMakeFiles/edit_cache.dir
-/home/badcw/workspace/icpc-bazel/build/CMakeFiles/rebuild_cache.dir

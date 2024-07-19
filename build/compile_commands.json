@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/badcw/workspace/icpc-bazel/build",
-  "command": "/usr/bin/c++ -Dbadcw -I/home/badcw/workspace/icpc-bazel/. -g -std=gnu++20 -o CMakeFiles/main.dir/main.cc.o -c /home/badcw/workspace/icpc-bazel/main.cc",
-  "file": "/home/badcw/workspace/icpc-bazel/main.cc",
-  "output": "CMakeFiles/main.dir/main.cc.o"
-}
-]
