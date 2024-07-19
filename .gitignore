@@ -15,5 +15,5 @@ main.cc
 /compare/data/*.in
 /compare/data/*.out
 /compare/bin
-/build
-/cmake-build-debug
+build/
+cmake-build-debug/
