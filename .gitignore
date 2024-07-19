@@ -18,3 +18,4 @@ main.cc
 build/
 cmake-build-debug/
 .cache/
+.idea/
