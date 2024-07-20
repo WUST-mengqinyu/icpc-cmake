@@ -20,16 +20,25 @@
 using namespace std;
 
 namespace inner {
+#define TKASE                                                                  \
+  int T;                                                                       \
+  scanf("%d", &T);                                                             \
+  for (int kase = 1; kase <= T; ++kase)
 ll qp(ll a, ll n);
 ll qp(ll a, ll n, int mod);
 namespace IO {
+template <class T> struct NoSuffix {
+  T t;
+};
 template <class T, class... U> void R(T &head, U &...tail);
+template <class T, class... U>
+void W(const NoSuffix<T> &head, const U &...tail);
 template <class T, class... U> void W(const T &head, const U &...tail);
 } // namespace IO
 } // namespace inner
 using namespace inner::IO;
 
-const int maxn = 2e5+50;
+const int maxn = 2e5 + 50;
 const int mod = 1e9 + 7;
 
 int f[maxn][10];
@@ -39,10 +48,10 @@ int main(int argc, char **agrv) {
   freopen((PROJECT_DIR + "/data.in").c_str(), "r", stdin);
 #endif
 
-  int T; scanf("%d", &T);
-  for (int kase = 1; kase <= T; ++kase) {
-    int n;R(n);
-    W(inner::qp(5, n));
+  TKASE {
+    int a;
+    R(a);
+    W(NoSuffix{"case #"}, kase, inner::qp(2, a));
   }
   return 0;
 }
@@ -61,6 +70,7 @@ namespace inner {
     void R() {}
     template <class T, class... U> void R(T &head, U &...tail) {_R(head), R(tail...);}
     template<class T> void _W(const T &x) { cout << x; }
+    template<class T> void _W(const NoSuffix<T> &x) { cout << x.t; }
     void _W(const int &x) { printf("%d", x); }
     void _W(const ll &x) { printf("%lld", x); }
     void _W(const double &x) { printf("%.16f", x); }
@@ -70,6 +80,7 @@ namespace inner {
     template<class T> void _W(const set<T> &x) { for (auto i = x.begin(); i != x.end(); _W(*i++)) if (i != x.cbegin()) putchar(' '); }
     template<class T> void _W(const vector<T> &x) { for (auto i = x.begin(); i != x.end(); _W(*i++)) if (i != x.cbegin()) putchar(' '); }
     void W() {}
+    template <class T, class... U> void W(const NoSuffix<T> &head, const U &...tail) { _W(head), W(tail...); }
     template <class T, class... U> void W(const T &head, const U &...tail) { _W(head), putchar(sizeof...(tail) ? ' ' : '\n'), W(tail...); }
 }
 ll qp(ll a, ll n) {
