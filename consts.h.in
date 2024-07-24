@@ -3,5 +3,7 @@
 
 #include <string>
 const std::string PROJECT_DIR = "@PROJECT_DIR@";
-
+const std::string ICPC_EXECUTABLE_LIST = "@icpc_executable_list@";
+const std::string ICPC_MAIN_SOURCE = "@icpc_main_source@";
+const std::string BUNDLE_OUT_DIR = "@BUNDLE_OUT_DIR@";
 #endif

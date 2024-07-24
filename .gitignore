@@ -20,4 +20,5 @@ cmake-build-debug/
 .cache/
 .idea/
 consts.h
-bin/*
+bin/*.cc
+bin_output/*.cc

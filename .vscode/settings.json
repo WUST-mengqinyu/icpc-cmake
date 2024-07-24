@@ -1,0 +1,21 @@
+{
+    "editor.tabSize": 2,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "third_party": true,
+        "build": true,
+        "bits": true,
+        "atcoder": true,
+        "LICENSE": true,
+        "consts.h": true,
+        // "consts.h.in": true,
+        "testlib.h": true,
+        ".gitmodules": true,
+        "README.md": true,
+    }
+}

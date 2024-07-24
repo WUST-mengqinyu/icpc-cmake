@@ -1,5 +1,0 @@
-cc_binary(
-    name = "gen",
-    srcs = ["gen.cc", "gen.h"],
-    deps = ["//:cf"],
-)
