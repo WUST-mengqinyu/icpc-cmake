@@ -1,4 +1,4 @@
-# icpc-bazel
-icpc-bazel sample code for CLion user.
+# icpc-cmake
+icpc-cmake sample code for vscode user.
 
 ---
