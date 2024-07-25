@@ -11,7 +11,7 @@ foreach(idx RANGE ${icpc_main_source_len})
 
     add_custom_command(
       OUTPUT ${PROJECT_DIR}/bin_output/${exec_name}.cc
-      COMMAND icpc-bundler gen --exec-name ${exec_name} --exec-path ${source_file}
+      COMMAND icpc-bundler gen --exec-name ${exec_name} --exec-path ${source_file} && gcc -fpreprocessed -dD -E ${PROJECT_DIR}/bin_output/${exec_name}.cc > ${PROJECT_DIR}/bin_output/${exec_name}_min.cc
       DEPENDS ${source_file}
       COMMENT "Executing bundler because the specific file was modified."
     )

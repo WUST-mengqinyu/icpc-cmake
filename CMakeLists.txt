@@ -45,6 +45,7 @@ get_property(icpc_main_source GLOBAL PROPERTY ICPC_MAIN_SOURCE)
 configure_file(consts.h.in ${CMAKE_CURRENT_SOURCE_DIR}/consts.h @ONLY)
 
 add_subdirectory(bundle)
+add_subdirectory(minify)
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/inner)
