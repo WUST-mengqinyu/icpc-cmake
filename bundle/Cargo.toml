@@ -1,0 +1,8 @@
+[package]
+name = "bundler"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.10", features = ["cargo", "derive"] }
+regex = "1.10.5"

@@ -28,17 +28,8 @@ foreach(v ${THRID_PARTY})
     set(${dir_name}_SOURCE_DIR ${v})
 endforeach()
 
-add_subdirectory(bundle)
-
-
-set_directory_properties(PROPERTIES CMAKE_CONFIGURE_DEPENDS ${CMAKE_HOME_DIRECTORY}/${BIN_PATH})
-
-add_icpc_executable(main main.cc)
-include_directories(${CMAKE_SOURCE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/inner)
-
 file(GLOB_RECURSE CC_SRC_LIST ${CMAKE_CURRENT_LIST_DIR}/${BIN_PATH}/*.cc)
-
+set_directory_properties(PROPERTIES CMAKE_CONFIGURE_DEPENDS ${CMAKE_HOME_DIRECTORY}/${BIN_PATH})
 foreach(v ${CC_SRC_LIST})
     string(REGEX MATCH "${BIN_PATH}/.*" relative_path ${v})
     string(REGEX REPLACE "${BIN_PATH}/" "" target_name ${relative_path})
@@ -46,8 +37,16 @@ foreach(v ${CC_SRC_LIST})
     add_icpc_executable(bin_${target_name} ${relative_path})
 endforeach()
 
+add_icpc_executable(main main.cc)
 
 get_property(icpc_executable_list GLOBAL PROPERTY ICPC_EXECUTABLES_LIST)
 get_property(icpc_main_source GLOBAL PROPERTY ICPC_MAIN_SOURCE)
 
 configure_file(consts.h.in ${CMAKE_CURRENT_SOURCE_DIR}/consts.h @ONLY)
+
+add_subdirectory(bundle)
+
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/inner)
+
+

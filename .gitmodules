@@ -1,9 +1,6 @@
 [submodule "Template"]
 	path = Template
 	url = https://github.com/WUST-mengqinyu/Template.git
-[submodule "third_party/ctre"]
-	path = third_party/compile-time-regular-expressions
-	url = https://github.com/hanickadot/compile-time-regular-expressions.git
 [submodule "ctre"]
 	path = third_party/ctre
 	url = https://github.com/hanickadot/compile-time-regular-expressions.git

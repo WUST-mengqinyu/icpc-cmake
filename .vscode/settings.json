@@ -13,9 +13,11 @@
         "atcoder": true,
         "LICENSE": true,
         "consts.h": true,
-        // "consts.h.in": true,
+        "consts.h.in": true,
         "testlib.h": true,
-        ".gitmodules": true,
         "README.md": true,
+        "bundle": true,
+        ".clang-format": true,
+        "**/.git*": true,
     }
 }
