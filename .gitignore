@@ -23,3 +23,4 @@ consts.h
 bin/*.cc
 bin_output/*.cc
 bundle/target/
+bundle/src/consts.rs
