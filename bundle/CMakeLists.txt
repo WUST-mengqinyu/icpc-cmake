@@ -1,10 +1,5 @@
 set(CMAKE_CXX_STANDARD 23)
 
-# add_executable(bundler bundler.cc)
-
-# target_include_directories(bundler PRIVATE ${ctre_SOURCE_DIR}/single-header)
-# include_directories(${CMAKE_SOURCE_DIR})
-
 configure_file(src/consts.rs.in ${CMAKE_CURRENT_SOURCE_DIR}/src/consts.rs @ONLY)
 
 # rebundler when icpc_main_source file changed
@@ -16,7 +11,7 @@ foreach(idx RANGE ${icpc_main_source_len})
 
     add_custom_command(
       OUTPUT ${PROJECT_DIR}/bin_output/${exec_name}.cc
-      COMMAND bundler gen --exec-name ${exec_name} --exec-path ${source_file}
+      COMMAND icpc-bundler gen --exec-name ${exec_name} --exec-path ${source_file}
       DEPENDS ${source_file}
       COMMENT "Executing bundler because the specific file was modified."
     )
