@@ -1,4 +1,4 @@
-#include "atcoder/all"
+#include "inner/num/static_mod_int.hpp"
 #include "inner/prelude"
 
 #define VI vector<int>
@@ -9,7 +9,7 @@ const int maxn = 2e5 + 50;
 const int mod = 1e9 + 7;
 
 int f[maxn][10];
-typedef atcoder::modint998244353 mint;
+using mint = inner::static_mod_int::modint998244353;
 int main(int argc, char **agrv) {
   mint a = 10;
   mint b = 1000;

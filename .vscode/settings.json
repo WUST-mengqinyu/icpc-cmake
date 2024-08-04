@@ -11,7 +11,7 @@
         "third_party": true,
         "build": true,
         "bits": true,
-        "atcoder": true,
+        // "atcoder": true,
         "LICENSE": true,
         "consts.h": true,
         "consts.h.in": true,

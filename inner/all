@@ -1,2 +1,2 @@
-#include "inner/number"
+#include "inner/num/all"
 #include "inner/prelude"
