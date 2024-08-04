@@ -30,6 +30,9 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/TargetParser/Host.h>
 
+#include "consts.h"
+#include <format>
+#include <fstream>
 #include <memory>
 #include <vector>
 
@@ -225,6 +228,13 @@ namespace {
       Renamer c(ctx, reps);
       c.TraverseDecl(ctx.getTranslationUnitDecl());
 
+      std::ofstream minify_out(std::format("{}/minify.yaml", PROJECT_DIR));
+      minify_out << "---" << std::endl;
+      for (auto i: reps) {
+        minify_out << "- Offset:  " << i.getOffset() << std::endl;
+        minify_out << "  NewName: " << i.getReplacementText().bytes_begin() << std::endl;
+      }
+
       auto &sm = ctx.getSourceManager();
       StringRef code = sm.getBufferData(sm.getMainFileID());
       auto res = tooling::applyAllReplacements(code, reps);
@@ -262,7 +272,8 @@ namespace {
 }// namespace
 
 int main(int argc, char *argv[]) {
-  std::vector<const char *> args{argv[0], "-fsyntax-only"};
+  std::vector<const char *>
+          args{argv[0], "-fsyntax-only"};
   bool inplace = false;
   const char *outfile = "/dev/stdout";
   const char usage[] = R"(Usage: %s [-i] [-f fun]... a.c
@@ -310,7 +321,7 @@ Options:
   if (Error e = action.Execute())
     errx(2, "failed to execute");
   action.EndSourceFile();
-  reformat();
+  // reformat();
 
   std::error_code ec;
   raw_fd_ostream(inplace ? inst->getFrontendOpts().Inputs[0].getFile() : outfile, ec, sys::fs::OF_None) << newCode;

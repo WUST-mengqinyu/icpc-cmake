@@ -12,7 +12,7 @@ pub struct BundlerContext {
 }
 
 fn get_replace_headers() -> Vec<(&'static str, &'static str)> {
-    return vec![("inner/", PROJECT_DIR)];
+    return vec![("inner/", PROJECT_DIR), ("atcoder/", PROJECT_DIR)];
 }
 
 impl BundlerContext {

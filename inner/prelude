@@ -6,7 +6,6 @@
 #ifdef badcw
 #pragma warning(push)
 #pragma warning(disable : 2892, 2893, 2894, 4096)
-#include "atcoder/all"
 #include "consts.h"
 auto _stdin = std::freopen((PROJECT_DIR + "/data.in").c_str(), "r", stdin);
 #include "testlib.h"// IWYU pragma: keep
@@ -15,6 +14,7 @@ auto _stdin = std::freopen((PROJECT_DIR + "/data.in").c_str(), "r", stdin);
 
 #define VI vector<int>
 #define ll long long
+#define ALL(x) x.begin(), x.end()
 
 namespace inner {
 #define TKASE      \
@@ -25,14 +25,17 @@ namespace inner {
   ll qp(ll a, ll n, int mod);
   namespace IO {
     template<class T>
-    struct NoSuffix {
+    struct ns {
       T t;
-      NoSuffix(T t) : t(t) {}
     };
+    template<class T>
+    ns<T> NoSuffix(T t) {
+      return ns<T>{.t = t};
+    }
     template<class T, class... U>
     void R(T &head, U &...tail);
     template<class T, class... U>
-    void W(const NoSuffix<T> &head, const U &...tail);
+    void W(const ns<T> &head, const U &...tail);
     template<class T, class... U>
     void W(const T &head, const U &...tail);
   }// namespace IO
@@ -59,7 +62,7 @@ namespace inner {
     template<class T>
     void _W(const T &x) { std::cout << x; }
     template<class T>
-    void _W(const NoSuffix<T> &x) { std::cout << x.t; }
+    void _W(const ns<T> &x) { std::cout << x.t; }
     void _W(const int &x) { printf("%d", x); }
     void _W(const ll &x) { printf("%lld", x); }
     void _W(const double &x) { printf("%.16f", x); }
@@ -79,7 +82,7 @@ namespace inner {
     }
     void W() {}
     template<class T, class... U>
-    void W(const NoSuffix<T> &head, const U &...tail) { _W(head), W(tail...); }
+    void W(const ns<T> &head, const U &...tail) { _W(head), W(tail...); }
     template<class T, class... U>
     void W(const T &head, const U &...tail) { _W(head), putchar(sizeof...(tail) ? ' ' : '\n'), W(tail...); }
   }// namespace IO
