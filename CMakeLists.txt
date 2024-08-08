@@ -48,9 +48,7 @@ add_subdirectory(bundle)
 
 if(${COMPILE_EXT})
     add_subdirectory(minify)
+    add_subdirectory(tests)
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/inner)
-
-
