@@ -2,7 +2,7 @@
 
 namespace inner {
   namespace num_bit {
-    int ceil_pow2(int n) {
+    constexpr int ceil_pow2(int n) {
 #if __cplusplus > 201703L && __GNUC__
       return std::bit_width(std::uint32_t(n));
 #else

@@ -3,6 +3,18 @@
 namespace inner {
   namespace seg_tree_op {
 #include "inner/num/bit.hpp"
+
+    struct NullType {
+      NullType() {};
+      bool operator==(const NullType &oth) {
+        return true;
+      }
+      template<class T>
+      friend T operator+=(const T &a, const NullType &b) {
+        return a;
+      }
+    };
+
     // need provides: S{}, S{_S_copy}, T{}, T == T(only need is zero), S += S, S += T, T += T
     template<class S, class T>
     struct seg {
@@ -46,12 +58,12 @@ namespace inner {
         pup_x(x);
       }
 
-      template<class Op>
-      void set(int x, Op op) {
+      template<void (*Op)(S &)>
+      void set(int x) {
         assert(1 <= x && x <= n);
         x += sz - 1;
         pdown_x(x);
-        op(p[x]);
+        Op(p[x]);
         pup_x(x);
       }
 

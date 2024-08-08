@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19.2)
 project(icpc)
 
 set(CMAKE_CXX_STANDARD 20)
-set(COMPILE_EXT false)
+set(COMPILE_EXT true)
 add_definitions(-Dbadcw)
 
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
