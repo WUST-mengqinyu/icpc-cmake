@@ -1,3 +1,4 @@
+#include "inner/ds/seg_tree_op.hpp"
 #include "inner/num/static_mod_int.hpp"
 #include "inner/prelude"
 
@@ -10,14 +11,32 @@ const int mod = 1e9 + 7;
 
 int f[maxn][10];
 using mint = inner::static_mod_int::modint998244353;
+
+using namespace inner::seg_tree_op;
+
+template<class T>
+struct PolyTag {
+  vector<T> poly;
+};
+
+enum PolyOpType {
+  Add,
+  Set,
+  Mul,
+};
+
+template<class T>
+struct PolyOp {
+  PolyOpType tp;
+  int p;
+  T v;
+};
+
+
 int main(int argc, char **agrv) {
-  mint a = 10;
-  mint b = 1000;
-  W((b / a).val(), (a / b).val(), a.pow(100).val());
-  TKASE {
-    int a;
-    R(a);
-    W(NoSuffix("case #"), kase, inner::qp<mod>(22, a));
-  }
+  // seg<mint, PolyTag<mint>> sg;
+  // sg.apply(1, 2, PolyOp<mint>{
+
+  //                });
   return 0;
 }

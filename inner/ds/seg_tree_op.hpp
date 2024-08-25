@@ -4,19 +4,68 @@ namespace inner {
   namespace seg_tree_op {
 #include "inner/num/bit.hpp"
 
-    struct NullType {
-      NullType() {};
-      bool operator==(const NullType &oth) {
+    struct NullTag {
+      NullTag() {};
+      const bool operator==(const NullTag &oth) {
         return true;
       }
       template<class T>
-      friend T operator+=(const T &a, const NullType &b) {
+      friend T operator+=(const T &a, const NullTag &b) {
         return a;
+      }
+      template<class T>
+      friend T operator+=(const NullTag &a, const T &b) {
+        return b;
+      }
+
+      NullTag operator+=(const NullTag &oth) {
+        return NullTag{};
       }
     };
 
-    // need provides: S{}, S{_S_copy}, T{}, T == T(only need is zero), S += S, S += T, T += T
     template<class S, class T>
+    concept SegTreeNode = requires(S s, T t) {
+      std::default_initializable<S>;
+      std::copy_constructible<S>;
+      std::default_initializable<T>;
+      s += t;
+      t += t;
+    };
+
+
+    template<const int N, class Num>
+    struct PolyTag {
+      std::array<Num, N> tg;
+    };
+
+
+#define OpGen(ClassName, Op)                                                    \
+  template<class Num>                                                           \
+  struct ClassName {                                                            \
+    const int dig = 0;                                                          \
+    ClassName(Num x) : x(x) {}                                                  \
+    ClassName(Num x, int poly_dig) : x(x), dig(poly_dig) {}                     \
+    Num x;                                                                      \
+    template<const int N>                                                       \
+    friend PolyTag<N, Num> operator+=(PolyTag<N, Num> &x, const ClassName &y) { \
+      x.tg[y.dig] Op y.x;                                                       \
+      return x;                                                                 \
+    }                                                                           \
+    friend Num operator+=(Num &x, const ClassName &y) {                         \
+      x Op y.x;                                                                 \
+      return x;                                                                 \
+    }                                                                           \
+  }// namespace seg_tree_op
+
+    OpGen(Set, =);
+    OpGen(Add, +=);
+    OpGen(Mul, *=);
+    OpGen(Div, /=);
+    OpGen(Mod, %=);
+
+    // need provides: S{}, S{_S_copy}, T{}, T == T(only need is zero), S += S, S += T, T += T, T += Op
+    template<class S, class T>
+      requires(SegTreeNode<S, T>)
     struct seg {
   public:
       std::vector<S> p;
@@ -55,15 +104,6 @@ namespace inner {
         x += sz - 1;
         pdown_x(x);
         p[x] = nw;
-        pup_x(x);
-      }
-
-      template<void (*Op)(S &)>
-      void set(int x) {
-        assert(1 <= x && x <= n);
-        x += sz - 1;
-        pdown_x(x);
-        Op(p[x]);
         pup_x(x);
       }
 
@@ -119,7 +159,8 @@ namespace inner {
         // todo;
       }
 
-      void apply(int x, T t) {
+      template<class Op>
+      void apply(int x, Op t) {
         assert(1 <= x && x <= n);
         x += sz - 1;
         pdown_x(x);
@@ -127,7 +168,8 @@ namespace inner {
         pup_x(x);
       }
 
-      void apply(int l, int r, T t) {
+      template<class Op>
+      void apply(int l, int r, Op t) {
         assert(1 <= l && l <= r && r <= n);
         l += sz - 1;
         r += sz;

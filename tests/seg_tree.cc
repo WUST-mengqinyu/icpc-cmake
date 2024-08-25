@@ -9,10 +9,10 @@ TEST(SegTreeOpTest, BasicAssertions) {
   sg.set(1, 5);
   sg.set(2, 3);
   sg.apply(1, 3, 2);
-  sg.set<[](int &x) { x = 1; }>(2);
+  sg.apply(2, Set(1));
   sg.apply(2, 7);
   EXPECT_EQ(5 + 8 + 2 * 2, sg.sum(1, 5));
-  seg<int, NullType> sg2(10);
+  seg<int, NullTag> sg2(10);
   sg2.set(1, 5);
   sg2.set(3, 7);
   EXPECT_EQ(5, sg2.get(1));
