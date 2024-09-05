@@ -11,16 +11,19 @@ runner
 # main file
 main.cc
 
+
+# build dir
+build/
+target/
+
 # data dir
 /compare/data/*.in
 /compare/data/*.out
 /compare/bin
-build/
 cmake-build-debug/
 .cache/
 .idea/
 consts.h
 bin/*.cc
 bin_output/*.cc
-bundle/target/
 bundle/src/consts.rs

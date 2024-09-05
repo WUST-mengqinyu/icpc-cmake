@@ -12,7 +12,7 @@ auto _stdin = std::freopen((PROJECT_DIR + "/data.in").c_str(), "r", stdin);
 #pragma warning(pop)
 #endif
 
-#define VI vector<int>
+#define VI std::vector<int>
 #define ll long long
 #define ULL unsigned ll
 #define ALL(x) x.begin(), x.end()
@@ -119,6 +119,13 @@ namespace inner {
     return r;
   }
 }// namespace inner
+
+
+#ifdef IN_ARCHIVE
+#define MAIN() void solve()
+#else
+#define MAIN() int main()
+#endif
 
 using namespace inner::IO;
 #endif
