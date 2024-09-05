@@ -25,6 +25,8 @@ if(${COMPILE_EXT})
     # third party
     if(DEFINED ENV{ENABLE_THIRD_PARTY})
         message(status "ENABLE_THIRD_PARTY is " $ENV{ENABLE_THIRD_PARTY})
+
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
         set(THIRD_PARTY_DIR third_party)
         file(GLOB THRID_PARTY ${THIRD_PARTY_DIR}/*)
         foreach(v ${THRID_PARTY})
@@ -34,14 +36,6 @@ if(${COMPILE_EXT})
             set(${dir_name}_SOURCE_DIR ${v})
         endforeach()
         # add_subdirectory(minify)
-
-        include(FetchContent)
-        FetchContent_Declare(
-            googletest
-            URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-        )
-        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-        FetchContent_MakeAvailable(googletest)
 
         # testing
         if(DEFINED ENV{ENABLE_TESTING})

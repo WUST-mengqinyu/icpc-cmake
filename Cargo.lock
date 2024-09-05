@@ -291,6 +291,7 @@ dependencies = [
  "fs2",
  "hyper",
  "icpc-project-gen",
+ "log",
  "once_cell",
  "regex",
  "reqwest",

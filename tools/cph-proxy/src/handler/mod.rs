@@ -1,6 +1,7 @@
 mod cmake_gen;
 mod context;
 
+use log::*;
 use super::model::*;
 use context::Context;
 use fs2::FileExt;
@@ -13,7 +14,7 @@ use std::{
 pub fn store_data(metadata: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
     let platform = CompetitvePlatform::parse_from_url(&metadata.url);
     let real_handler = platform.dispatch();
-    tracing::info!("handle platform: {:?}", platform);
+    info!("handle platform: {:?}", platform);
     real_handler.as_ref().handle(metadata)
 }
 
@@ -149,12 +150,11 @@ impl CodeforcesHandler {
 impl ProblemMetaWithTestCaseHandler for CodeforcesHandler {
     fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
         let cx = Self::get_context(data)?;
-        tracing::info!(
+        info!(
             "start write to contest: {}, problem: {}",
             cx.contest_id,
             cx.problem_id,
         );
-        {}
         std::fs::create_dir_all(cx.home_dir.join("cases"))?;
         for (i, test) in data.tests.iter().enumerate() {
             let path = cx.home_dir.clone();

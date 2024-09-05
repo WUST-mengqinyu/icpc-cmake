@@ -16,6 +16,7 @@ pub struct Config {
     pub others_project_path: PathBuf,
     pub lock_file_delay_seconds: u64,
     pub lock_file_max_try: u64,
+    pub must_self_host: bool,
 }
 
 impl Config {
@@ -42,6 +43,7 @@ impl Default for Config {
             others_project_path: std::path::PathBuf::from(PROJECT_DIR).join("archive/others"),
             lock_file_delay_seconds: 2,
             lock_file_max_try: 3,
+            must_self_host: false,
         }
     }
 }

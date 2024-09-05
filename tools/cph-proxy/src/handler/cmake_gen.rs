@@ -21,11 +21,12 @@ TEST_SAMPLE_CASE({i})
 // {end_loop}
 ";
 
-const DEFAULT_MAIN_HEADER_TEMPLATE: &str = "
-#include \"inner/prelude\"
+const DEFAULT_MAIN_HEADER_TEMPLATE: &str = 
+"#include \"inner/prelude\"
 using namespace inner;
 
-void solve() {
+MAIN() {
+  return 0;
 }
 ";
 

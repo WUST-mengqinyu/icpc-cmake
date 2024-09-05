@@ -122,7 +122,7 @@ namespace inner {
 
 
 #ifdef IN_ARCHIVE
-#define MAIN() void solve()
+#define MAIN() inline int solve()
 #else
 #define MAIN() int main()
 #endif

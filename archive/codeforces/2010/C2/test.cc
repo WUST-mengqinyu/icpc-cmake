@@ -3,7 +3,7 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
-const std::string CUR_DIR = "/home/badcw/repo/icpc-cmake/archive/codeforces/2010/C2/cases/";
+const std::string CUR_DIR = PROJECT_DIR+ "/archive/codeforces/2010/C2/cases/";
 
 // {
 TEST_SAMPLE_CASE(0)

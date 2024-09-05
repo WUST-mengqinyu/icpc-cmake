@@ -1,8 +1,0 @@
-name = "C1. Message Transmission Error (easy version)"
-group = "Codeforces - Testing Round 19 (Div. 3)"
-url = "https://codeforces.com/problemset/problem/2010/C1"
-interactive = false
-memory_limit = 256
-time_limit = 2000
-tests = []
-test_type = "single"

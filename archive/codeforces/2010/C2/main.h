@@ -1,6 +1,5 @@
 #include "inner/prelude"
 using namespace inner;
-const int N = 1e5 + 8;
 
 MAIN() {
   std::string s;
@@ -26,4 +25,5 @@ MAIN() {
   } else {
     W("NO");
   }
+  return 0;
 }

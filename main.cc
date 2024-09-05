@@ -49,7 +49,7 @@ namespace ODT {
 
 }// namespace ODT
 
-int main() {
+MAIN() {
   int n;
   R(n);
   vector<int> a(n), b(n);
