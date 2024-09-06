@@ -1,6 +1,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 pub type CodeforcesContext = Arc<Context<u32, String>>;
+pub type AtcoderContext = Arc<Context<(String, u32), String>>;
 
 #[derive(Debug, Default)]
 pub struct Context<ContestID: Debug, ProblemID: Debug> {

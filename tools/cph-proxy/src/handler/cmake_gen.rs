@@ -14,15 +14,14 @@ const DEFAULT_TEST_CC_TEMPLATE: &str = "#include \"inner/tools/test_suite.hpp\"
 #include <cstring>
 #include <gtest/gtest.h>
 
-const std::string CUR_DIR = \"{cur_dir}/cases/\";
+const std::string CUR_DIR = PROJECT_DIR + \"/archive/codeforces/{contest_id}/{problem_id}/cases/\";
 
 // {start_loop}
 TEST_SAMPLE_CASE({i})
 // {end_loop}
 ";
 
-const DEFAULT_MAIN_HEADER_TEMPLATE: &str = 
-"#include \"inner/prelude\"
+const DEFAULT_MAIN_HEADER_TEMPLATE: &str = "#include \"inner/prelude\"
 using namespace inner;
 
 MAIN() {
@@ -32,7 +31,7 @@ MAIN() {
 
 use super::context;
 use crate::model::ProblemMetaWithTestCase;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use std::{collections::HashMap, io::Write, path::Path};
 
 pub fn cmake_gen(cx: context::CodeforcesContext, data: &ProblemMetaWithTestCase) -> Result<()> {
@@ -49,6 +48,8 @@ pub fn cmake_gen(cx: context::CodeforcesContext, data: &ProblemMetaWithTestCase)
                 .to_str()
                 .ok_or(anyhow!("home dir to string failed: {:?}", cx.home_dir))?,
         )
+        .replace("{contest_id}", cx.contest_id.to_string().as_str())
+        .replace("{problem_id}", &cx.problem_id)
         .replace_loop(
             data.tests
                 .len()
@@ -63,6 +64,11 @@ pub fn cmake_gen(cx: context::CodeforcesContext, data: &ProblemMetaWithTestCase)
         (cx.home_dir.join("main.h").as_path(), main_header),
     ]))?;
 
+    Ok(())
+}
+
+// todo: use cmake auto detect
+fn add_to_cmake_target(cx: context::CodeforcesContext) -> Result<()> {
     let codeforces_parent_cmake_path = cx
         .home_dir
         .parent() // contest
@@ -118,17 +124,23 @@ impl LoopReplace for &str {
 fn create_if_not_exist(mp: &HashMap<&Path, String>) -> Result<()> {
     for (path, content) in mp {
         let f = std::fs::OpenOptions::new()
-            .create(true)
-            .truncate(false)
-            .append(false)
+            .create_new(true)
+            .write(true)
             .open(path);
         if f.as_ref()
             .is_err_and(|e| e.kind() == std::io::ErrorKind::AlreadyExists)
         {
             continue;
         }
-        let mut f = f?;
-        f.write_all(content.as_bytes())?;
+        let mut f = f.with_context(|| {
+            format!("failed to create if not exist in path: {}", path.display())
+        })?;
+        f.write_all(content.as_bytes()).with_context(|| {
+            format!(
+                "failed to create if not exist on writing in path: {}",
+                path.display()
+            )
+        })?;
         f.sync_all()?;
     }
     Ok(())

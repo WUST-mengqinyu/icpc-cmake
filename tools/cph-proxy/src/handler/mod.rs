@@ -1,10 +1,10 @@
 mod cmake_gen;
 mod context;
 
-use log::*;
 use super::model::*;
-use context::Context;
+use anyhow::Context;
 use fs2::FileExt;
+use log::*;
 use std::{
     io::{Read, Write},
     path::{Path, PathBuf},
@@ -74,7 +74,10 @@ impl CodeforcesHandler {
     fn parse_contest_and_problem_id_from_url(url: &str) -> (u32, String) {
         static CODEFORCES_URL_RE: std::sync::LazyLock<regex::Regex> =
             std::sync::LazyLock::new(|| {
-                regex::Regex::new(r"problem/(\d+)/(\w+)").expect("codeforces url regex not correct")
+                regex::Regex::new(
+                    r"codeforces\.com/(?:problemset/problem|contest)/(\d+)/(?:problem/)?(\w+)",
+                )
+                .expect("codeforces url regex not correct")
             });
         CODEFORCES_URL_RE
             .captures(url)
@@ -88,6 +91,7 @@ impl CodeforcesHandler {
             .unwrap_or((0, "0".to_owned()))
     }
 
+    // FIXME: cannot lock and add problem_id correctly
     fn get_unknown_problem_id(project_dir: PathBuf) -> anyhow::Result<u32> {
         let lockfile = project_dir.join(".cnt.lock");
         let mut f = std::fs::OpenOptions::new()
@@ -134,12 +138,13 @@ impl CodeforcesHandler {
         if contest_id == 0 {
             problem_id = Self::get_unknown_problem_id(
                 super::cfg::GLOBAL_CFG.codeforces_project_path.clone(),
-            )?
+            )
+            .with_context(|| format!("get contest_id 0 and problem_id failed: {}", &data.url))?
             .to_string();
         }
         let rt = super::cfg::GLOBAL_CFG.codeforces_project_path.clone();
         let home_dir = rt.join(contest_id.to_string()).join(&problem_id);
-        Ok(Arc::new(Context {
+        Ok(Arc::new(context::Context {
             home_dir,
             contest_id,
             problem_id,
@@ -149,26 +154,34 @@ impl CodeforcesHandler {
 
 impl ProblemMetaWithTestCaseHandler for CodeforcesHandler {
     fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
-        let cx = Self::get_context(data)?;
+        let cx = Self::get_context(data).with_context(|| {
+            format!("failed to get context from metadata: {}", data.url.as_str())
+        })?;
         info!(
             "start write to contest: {}, problem: {}",
-            cx.contest_id,
-            cx.problem_id,
+            cx.contest_id, cx.problem_id,
         );
-        std::fs::create_dir_all(cx.home_dir.join("cases"))?;
+        std::fs::create_dir_all(cx.home_dir.join("cases")).with_context(|| {
+            format!(
+                "failed to create all dir in {}",
+                cx.home_dir.join("cases").display()
+            )
+        })?;
         for (i, test) in data.tests.iter().enumerate() {
             let path = cx.home_dir.clone();
             let mut f = std::fs::OpenOptions::new()
                 .create(true)
                 .truncate(true)
                 .write(true)
-                .open(path.join("cases").join(format!("{}.in", i)))?;
+                .open(path.join("cases").join(format!("{}.in", i)))
+                .with_context(|| format!("failed to write cases {} input", i,))?;
             f.write_all(test.input.as_bytes())?;
             let mut f = std::fs::OpenOptions::new()
                 .create(true)
                 .truncate(true)
                 .write(true)
-                .open(path.join("cases").join(format!("{}.out", i)))?;
+                .open(path.join("cases").join(format!("{}.out", i)))
+                .with_context(|| format!("failed to write cases {} output", i,))?;
             f.write_all(test.output.as_bytes())?;
         }
         let mut f = std::fs::OpenOptions::new()
@@ -178,9 +191,15 @@ impl ProblemMetaWithTestCaseHandler for CodeforcesHandler {
             .open(cx.home_dir.join("info.toml"))?;
         let mut metadata = data.clone();
         metadata.tests = vec![];
-        f.write_all(toml::to_string(&metadata)?.as_bytes())?;
+        f.write_all(toml::to_string(&metadata)?.as_bytes())
+            .with_context(|| {
+                format!(
+                    "failed to write metadata in path: {}",
+                    cx.home_dir.join("info.toml").display()
+                )
+            })?;
 
-        cmake_gen::cmake_gen(cx, data)?;
+        cmake_gen::cmake_gen(cx, data).with_context(|| "failed to cmake_gen")?;
         Ok(())
     }
 }
@@ -233,5 +252,24 @@ mod tests {
             platform,
             CompetitvePlatform::Unknown("not_a_url".to_owned())
         );
+    }
+
+    #[test]
+    fn test_get_codeforces_contest_and_problem_id() {
+        let urls = [
+            (
+                "https://codeforces.com/problemset/problem/2010/C2",
+                2010,
+                "C2",
+            ),
+            ("https://codeforces.com/contest/2010/problem/C2", 2010, "C2"),
+        ];
+
+        for (url, contest_id, problem_id) in urls {
+            assert_eq!(
+                (contest_id, problem_id.to_owned()),
+                CodeforcesHandler::parse_contest_and_problem_id_from_url(url)
+            );
+        }
     }
 }

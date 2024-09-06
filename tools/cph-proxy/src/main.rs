@@ -1,7 +1,7 @@
 mod cfg;
 mod handler;
-pub mod model;
 mod init;
+pub mod model;
 
 use axum::routing::any;
 use axum::{body::Bytes, http::StatusCode, Router};

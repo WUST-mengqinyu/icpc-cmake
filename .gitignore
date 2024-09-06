@@ -16,6 +16,11 @@ main.cc
 build/
 target/
 
+# archive dir
+archive/codeforces/*/
+archive/atcoder/*/
+
+
 # data dir
 /compare/data/*.in
 /compare/data/*.out

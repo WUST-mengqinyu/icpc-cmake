@@ -1,4 +1,16 @@
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(2010/C2)
-add_subdirectory(2010/C1)
+file(GLOB CONTEST_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
+
+foreach(CONTEST_DIR ${CONTEST_DIRS})
+  if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_DIR})
+    file(GLOB PROBLEM_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_DIR}/*)
+    foreach(PROBLEM_DIR ${PROBLEM_DIRS})
+      if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_DIR}/${PROBLEM_DIR}/CMakeLists.txt"
+         AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_DIR}/${PROBLEM_DIR}/.cmake-ignore")
+        # 添加子目录到构建中
+        add_subdirectory("${CONTEST_DIR}/${PROBLEM_DIR}")
+      endif()
+    endforeach()
+  endif()
+endforeach()
