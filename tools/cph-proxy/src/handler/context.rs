@@ -1,9 +1,7 @@
-use std::{fmt::Debug, sync::Arc};
+use std::fmt::Debug;
 
-pub type CodeforcesContext = Arc<Context<u32, String>>;
-pub type AtcoderContext = Arc<Context<(String, u32), String>>;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Context<ContestID: Debug, ProblemID: Debug> {
     pub home_dir: std::path::PathBuf,
     pub contest_id: ContestID,

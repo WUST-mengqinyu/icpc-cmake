@@ -16,18 +16,23 @@
         "build": true,
         "bits": true,
         "**/Cargo.lock": true,
-        // "atcoder": true,
+        "atcoder": true,
+        "inner": true,
+        "tests": true,
         "LICENSE": true,
         "consts.h": true,
         "consts.h.in": true,
         "testlib.h": true,
         "README.md": true,
         "**/target": true,
-        // "bundle": true,
+        "Template": true,
+        // "tools": true,
         "minify": true,
         "compare": true,
         ".clang-format": true,
         "**/.git*": true,
+        "Cargo.toml": true,
+        "install.sh": true,
     },
     "cmake.environment": {
         "GTEST_BRIEF": "1",
@@ -37,6 +42,6 @@
         "ENABLE_ARCHIVE": "true",
     },
     "rust-analyzer.cargo.extraEnv": {
-        "RUST_LOG": "info"
+        "RUST_LOG": "info",
     }
 }

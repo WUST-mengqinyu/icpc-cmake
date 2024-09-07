@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <string>
 
+// FIXME: output and ans path
 template<class F, class CMP>
 void test_io(const std::string testCase, const std::string &inputPath, const std::string &outputPath, const std::string &ansPath, F solve, CMP cmp) {
   pid_t pid = fork();
@@ -17,7 +18,7 @@ void test_io(const std::string testCase, const std::string &inputPath, const std
     clock_t ST = clock();
     waitpid(pid, &status, 0);
     std::cout << ColorS(color_orange, color_dark_blue, "Case #" + testCase) << " solve use time: " << ((clock() - ST) * 1000.0 / CLOCKS_PER_SEC) << "ms" << std::endl;
-    bool equal = wcmp(outputPath, ansPath);
+    bool equal = wcmp(ansPath, outputPath);
     if (!equal) {
       std::cout << ColorS(color_red, color_dark_blue, "case input:") << " " << inputPath << std::endl;
     }

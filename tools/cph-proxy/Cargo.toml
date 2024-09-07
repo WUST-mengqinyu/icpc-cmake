@@ -19,5 +19,7 @@ log.workspace = true
 axum = { version = "0.7.5", features = ["default"] }
 hyper = { version = "1.4.1", features = ["full"] }
 fs2 = { version = "0.4.3" }
+hotwatch = { version = "0.5.0" }
+lazy_static = "*"
 
 icpc-project-gen = { path = "../icpc-project-gen" }

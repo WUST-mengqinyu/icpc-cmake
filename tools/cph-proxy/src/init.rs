@@ -1,9 +1,11 @@
-use super::cfg::GLOBAL_CFG;
+use std::thread::JoinHandle;
+
+use crate::cfg::init_refresh_global_cfg;
 use tracing_subscriber::fmt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
-pub(super) fn init() {
+pub(super) fn init() -> JoinHandle<()> {
     tracing_subscriber::registry().with(fmt::layer()).init();
-    let _cfg = GLOBAL_CFG.clone(); // init config
+    init_refresh_global_cfg()
 }

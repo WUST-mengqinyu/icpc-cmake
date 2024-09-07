@@ -1,6 +1,0 @@
-#![allow(dead_code)]
-pub static PROJECT_DIR: &str = "@PROJECT_DIR@";
-pub static ICPC_EXECUTABLE_LIST: &str = "@icpc_executable_list@";
-pub static ICPC_MAIN_SOURCE: &str = "@icpc_main_source@";
-pub static BUNDLE_OUT_DIR: &str = "@BUNDLE_OUT_DIR@";
-pub static EXCEPT_DEF: &str = "badcw";
