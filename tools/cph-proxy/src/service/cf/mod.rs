@@ -1,6 +1,6 @@
-use crate::handler::ProblemMetaWithTestCaseHandler;
-use crate::handler::{create_files_if_absent, get_unknown_problem_id};
-use crate::{cfg, handler::context, model::*};
+use crate::service::ProblemMetaWithTestCaseHandler;
+use crate::service::{create_files_if_absent, get_unknown_problem_id};
+use crate::{cfg, model::*, service::context};
 use anyhow::Context;
 use log::*;
 use std::sync::Arc;
@@ -34,9 +34,12 @@ impl CodeforcesHandler {
     fn get_context(data: &ProblemMetaWithTestCase) -> anyhow::Result<CodeforcesContext> {
         let (contest_id, mut problem_id) = Self::parse_contest_and_problem_id_from_url(&data.url);
         if contest_id == 0 {
-            problem_id = get_unknown_problem_id(cfg::get_global_cfg().codeforces_project_path.as_path())
-                .with_context(|| format!("get contest_id 0 and problem_id failed: {}", &data.url))?
-                .to_string();
+            problem_id =
+                get_unknown_problem_id(cfg::get_global_cfg().codeforces_project_path.as_path())
+                    .with_context(|| {
+                        format!("get contest_id 0 and problem_id failed: {}", &data.url)
+                    })?
+                    .to_string();
         }
         let rt = cfg::get_global_cfg().codeforces_project_path.clone();
         let home_dir = rt.join(contest_id.to_string()).join(&problem_id);
@@ -48,8 +51,9 @@ impl CodeforcesHandler {
     }
 }
 
+#[async_trait::async_trait]
 impl ProblemMetaWithTestCaseHandler for CodeforcesHandler {
-    fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
+    async fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
         let cx = Self::get_context(data).with_context(|| {
             format!("failed to get context from metadata: {}", data.url.as_str())
         })?;
@@ -99,10 +103,13 @@ impl ProblemMetaWithTestCaseHandler for CodeforcesHandler {
                 )
                 .collect::<Vec<_>>(),
         )
+        .await
         .with_context(|| "failed to dump test cases and metadata")?;
 
         // cmake project prepare
-        Self::cmake_gen(cx, data).with_context(|| "failed to cmake_gen")?;
+        Self::cmake_gen(cx, data)
+            .await
+            .with_context(|| "failed to cmake_gen")?;
         Ok(())
     }
 }

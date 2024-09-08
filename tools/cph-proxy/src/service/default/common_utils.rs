@@ -4,15 +4,19 @@ use std::{
     io::{Read, Write},
     path::Path,
 };
+use tokio::io::AsyncWriteExt as _;
 
-use crate::cfg;
+use crate::cfg::{self, get_global_cfg};
 
-pub(crate) fn create_files_if_absent<P: AsRef<Path>, T: AsRef<[u8]>>(mp: &[(P, T)]) -> Result<()> {
+pub(crate) async fn create_files_if_absent<P: AsRef<Path>, T: AsRef<[u8]>>(
+    mp: &[(P, T)],
+) -> Result<()> {
     for (path, content) in mp {
-        let f = std::fs::OpenOptions::new()
+        let f = tokio::fs::OpenOptions::new()
             .create_new(true)
             .write(true)
-            .open(path);
+            .open(path)
+            .await;
         if f.as_ref()
             .is_err_and(|e| e.kind() == std::io::ErrorKind::AlreadyExists)
         {
@@ -24,13 +28,13 @@ pub(crate) fn create_files_if_absent<P: AsRef<Path>, T: AsRef<[u8]>>(mp: &[(P, T
                 path.as_ref().display()
             )
         })?;
-        f.write_all(content.as_ref()).with_context(|| {
+        f.write_all(content.as_ref()).await.with_context(|| {
             format!(
                 "failed to create if not exist on writing in path: {}",
                 path.as_ref().display()
             )
         })?;
-        f.sync_all()?;
+        f.sync_all().await?;
     }
     Ok(())
 }
@@ -94,4 +98,56 @@ fn get_unknown_problem_id_within_locked(path: &Path, f: &mut std::fs::File) -> a
     let id = u32::from_be_bytes(buf) + 1;
     f.write_all(&id.to_be_bytes())?;
     Ok(id)
+}
+
+lazy_static::lazy_static! {
+    static ref RECENT_RUNNING_UUID: tokio::sync::Mutex<String> = tokio::sync::Mutex::new(String::new());
+}
+
+pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
+    uuid: T,
+    src_path: P,
+    name: T,
+) -> anyhow::Result<()> {
+    let cfg = get_global_cfg();
+    if !cfg.is_running() {
+        return Ok(());
+    }
+    if let Some(mode) = cfg.running_mode {
+        let mut recent_running_uuid = RECENT_RUNNING_UUID.lock().await;
+        if mode.remove_old_linkers && !recent_running_uuid.as_str().ne(uuid.as_ref()) {
+            *recent_running_uuid = uuid.as_ref().to_owned();
+            remove_old_linkers(
+                get_global_cfg()
+                    .running_mode
+                    .ok_or(anyhow::anyhow!("not in running mode"))?
+                    .running_path
+                    .as_path(),
+            )
+            .await?;
+        }
+        tokio::fs::symlink(src_path.as_ref(), mode.running_path.join(name.as_ref())).await?;
+    }
+    Ok(())
+}
+
+async fn remove_old_linkers(running_path: &Path) -> anyhow::Result<()> {
+    while let Some(v) = tokio::fs::read_dir(running_path)
+        .await?
+        .next_entry()
+        .await?
+    {
+        let meta = v.metadata().await.with_context(|| {
+            format!(
+                "read file metadata in running path failed: {}",
+                v.path().display()
+            )
+        })?;
+        if meta.is_symlink() {
+            tokio::fs::remove_file(v.path())
+                .await
+                .with_context(|| format!("remove symlinke file failed: {}", v.path().display()))?;
+        }
+    }
+    Ok(())
 }

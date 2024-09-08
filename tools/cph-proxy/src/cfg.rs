@@ -20,15 +20,32 @@ pub struct Config {
     pub lock_file_delay_seconds: u64,
     pub lock_file_max_try: u64,
     pub must_self_host: bool,
-    running_mode: Option<bool>,
+    pub running_mode: Option<RunningMode>,
     #[serde(skip)]
-    setted_by: ConfigSettedBy,
+    pub setted_by: ConfigSettedBy,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+pub struct RunningMode {
+    pub enable: bool,
+    pub running_path: PathBuf,
+    pub remove_old_linkers: bool,
+}
+impl Default for RunningMode {
+    fn default() -> RunningMode {
+        RunningMode {
+            enable: true,
+            running_path: std::path::PathBuf::from(PROJECT_DIR).join("bin"),
+            remove_old_linkers: true,
+        }
+    }
 }
 
 impl Config {
-    #[allow(dead_code)]
-    fn is_running(&self) -> bool {
-        self.running_mode.unwrap_or(false)
+    pub fn is_running(&self) -> bool {
+        self.running_mode
+            .as_ref()
+            .map_or_else(|| false, |mode| mode.enable)
     }
 
     fn dump(&self) -> Result<()> {
@@ -55,22 +72,32 @@ impl Default for Config {
             lock_file_delay_seconds: 2,
             lock_file_max_try: 3,
             must_self_host: false,
-            running_mode: None,
+            running_mode: Some(RunningMode::default()),
             setted_by: ConfigSettedBy::Default,
         }
     }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-enum ConfigSettedBy {
+pub enum ConfigSettedBy {
     SysCfgPath,
     WorkspaceCfgPath,
     #[default]
     Default,
 }
 
+impl From<ConfigSettedBy> for idl_gen::info::ConfigSettedBy {
+    fn from(val: ConfigSettedBy) -> Self {
+        match val {
+            ConfigSettedBy::SysCfgPath => idl_gen::info::ConfigSettedBy::SYS_CFG,
+            ConfigSettedBy::WorkspaceCfgPath => idl_gen::info::ConfigSettedBy::WORKSPACE_CFG,
+            ConfigSettedBy::Default => idl_gen::info::ConfigSettedBy::DEFAULT,
+        }
+    }
+}
+
 lazy_static::lazy_static!(
-    static ref  GLOBAL_CFG: RwLock<Config> = RwLock::new(Default::default());
+    static ref GLOBAL_CFG: RwLock<Config> = RwLock::new(Default::default());
 );
 
 fn read_config_from_file<P: AsRef<Path>>(path: P) -> anyhow::Result<Config> {
@@ -89,11 +116,23 @@ pub fn init_refresh_global_cfg() -> JoinHandle<()> {
     static WORKSPACE_CFG_PATH: Lazy<std::io::Result<PathBuf>> =
         Lazy::new(|| std::env::current_dir().map(|v| v.join(".config")));
 
-    if read_config_from_file(SYS_CFG_PATH.as_path()).is_err() {
-        Config::default()
-            .dump()
-            .expect("dump default config failed");
+    match read_config_from_file(SYS_CFG_PATH.as_path()) {
+        Ok(cfg) => {
+            *GLOBAL_CFG.write().expect("lock global_cfg failed") = cfg;
+        }
+        Err(_) => {
+            Config::default()
+                .dump()
+                .expect("dump default config failed");
+        }
     }
+
+    let _ = WORKSPACE_CFG_PATH.as_ref().is_ok_and(|path| {
+        if let Ok(cfg) = read_config_from_file(path) {
+            *GLOBAL_CFG.write().expect("lock global_cfg failed") = cfg;
+        };
+        true
+    });
 
     std::thread::spawn(|| {
         let mut hotwatch =

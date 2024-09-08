@@ -1,0 +1,17 @@
+[package]
+name = "idl-gen"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+volo.workspace = true
+volo-grpc.workspace = true
+pilota.workspace = true
+anyhow.workspace = true
+futures.workspace = true
+tokio.workspace = true
+serde.workspace = true
+
+[build-dependencies]
+volo-build = { version = "0.10" }
+pilota-build = { version = "0.11" }

@@ -1,8 +1,1 @@
-listen_host = ["0.0.0.0", 10045]
-codeforces_project_path = "/home/badcw/workspace/icpc-cmake/archive/codeforces"
-atcoder_project_path = "/home/badcw/workspace/icpc-cmake/archive/atcoder"
-others_project_path = "/home/badcw/workspace/icpc-cmake/archive/others"
-lock_file_delay_seconds = 2
-lock_file_max_try = 3
-must_self_host = false
-is_running = true
+../../.vscode/config.toml

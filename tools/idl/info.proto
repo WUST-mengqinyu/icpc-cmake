@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package info;
+
+import "base.proto";
+
+message EchoRequest {
+  string message = 1;
+}
+
+message EchoResponse {
+  string message = 1;
+  int64 unix_time = 2;
+  base.BaseResp base_resp = 255;
+}
+
+message LocalConfigRequest {
+}
+
+message Host {
+  string ip_addr = 1;
+  uint32 port = 2;
+}
+
+enum ConfigSettedBy {
+  SysCfg = 0;
+  WorkspaceCfg = 1;
+  Default = 2;
+}
+
+message RunningMode {
+  bool enable = 1;
+  string running_path = 2;
+  bool remove_old_linkers = 3;
+}
+
+message Config {
+  Host listen_host = 1;
+  optional Host to_host = 2;
+  optional Host to_host_proxy = 3;
+  string codeforces_project_path = 4;
+  string atcoder_project_path = 5;
+  string others_project_path = 6;
+  uint64 lock_file_delay_seconds = 7;
+  uint64 lock_file_max_try = 8;
+  bool must_self_host = 9;
+  RunningMode running_mode = 10;
+  ConfigSettedBy setted_by = 11;
+}
+
+message LocalConfigResponse {
+  Config config = 1;
+  base.BaseResp base_resp = 255;
+}
+
+service Echo {
+  rpc Echo(EchoRequest) returns (EchoResponse) {}
+}
+
+service ConfigInfo {
+  rpc LocalConfig(LocalConfigRequest) returns (LocalConfigResponse) {}
+}

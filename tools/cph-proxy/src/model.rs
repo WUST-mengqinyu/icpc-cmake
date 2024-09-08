@@ -12,6 +12,13 @@ pub struct ProblemMetaWithTestCase {
     pub tests: Vec<TestCase>,
     #[serde(alias = "testType")]
     pub test_type: TestType,
+    pub batch: Batch,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Batch {
+    pub id: String,
+    pub size: u32,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

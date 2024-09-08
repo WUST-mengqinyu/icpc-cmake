@@ -1,8 +1,8 @@
 use crate::cfg;
-use crate::handler::context;
-use crate::handler::ProblemMetaWithTestCaseHandler;
-use crate::handler::{create_files_if_absent, get_unknown_problem_id};
 use crate::model::*;
+use crate::service::context;
+use crate::service::ProblemMetaWithTestCaseHandler;
+use crate::service::{create_files_if_absent, get_unknown_problem_id};
 use anyhow::Context as _;
 use log::*;
 use std::sync::Arc;
@@ -89,8 +89,9 @@ impl AtcoderHandler {
     }
 }
 
+#[async_trait::async_trait]
 impl ProblemMetaWithTestCaseHandler for AtcoderHandler {
-    fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
+    async fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
         let cx = Self::get_context(data).with_context(|| {
             format!("failed to get context from metadata: {}", data.url.as_str())
         })?;
@@ -140,10 +141,13 @@ impl ProblemMetaWithTestCaseHandler for AtcoderHandler {
                 )
                 .collect::<Vec<_>>(),
         )
+        .await
         .with_context(|| "failed to dump test cases and metadata")?;
 
         // cmake project prepare
-        Self::cmake_gen(cx, data).with_context(|| "failed to cmake_gen")?;
+        Self::cmake_gen(cx, data)
+            .await
+            .with_context(|| "failed to cmake_gen")?;
         Ok(())
     }
 }

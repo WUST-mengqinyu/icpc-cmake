@@ -1,9 +1,12 @@
 {
-    // "editor.tabSize": 2,
-    // "editor.indentSize": "tabSize",
     "[cpp]": {
         "editor.tabSize": 2,
         "editor.indentSize": "tabSize",
+    },
+    "protoc": {
+        "options": [
+            "--proto_path=${workspaceRoot}/tools/idl",
+        ]
     },
     "files.exclude": {
         "**/.git": true,
@@ -26,12 +29,14 @@
         "README.md": true,
         "**/target": true,
         "Template": true,
+        ".config": true,
+        "**/info.toml": true,
         // "tools": true,
         "minify": true,
         "compare": true,
         ".clang-format": true,
         "**/.git*": true,
-        "Cargo.toml": true,
+        // "Cargo.toml": true,
         "install.sh": true,
     },
     "cmake.environment": {

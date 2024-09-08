@@ -32,3 +32,4 @@ consts.h
 bin/*.cc
 bin_output/*.cc
 bundle/src/consts.rs
+tools/idl-gen-plugins
