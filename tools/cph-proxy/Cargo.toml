@@ -25,7 +25,16 @@ hyper = { version = "1.4.1", features = ["full"] }
 fs2 = { version = "0.4.3" }
 hotwatch = { version = "0.5.0" }
 lazy_static = { version = "1.5" }
+crc32fast = { version = "1.4.2", optional = true }
+wl-clipboard-rs = { version = "0.9.0", optional = true }
 
 idl-gen = { path = "../idl-gen" }
 # idl-gen-plugins = { path = "../idl-gen-plugins" }
 icpc-project-gen = { path = "../icpc-project-gen" }
+
+[dev-dependencies]
+temp-dir = { version = "0.1.13" }
+
+[features]
+default = ["clipboard_proxy"]
+clipboard_proxy = ["crc32fast", "wl-clipboard-rs"]

@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Copy Output File",
+            "type": "shell",
+            "command": "${workspaceFolder}/copy_output.sh",
+            "args": [
+                "${fileBasenameNoExtension}"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

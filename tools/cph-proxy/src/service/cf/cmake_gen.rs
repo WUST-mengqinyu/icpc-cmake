@@ -30,7 +30,7 @@ MAIN() {
 
 use super::CodeforcesHandler;
 use crate::model::ProblemMetaWithTestCase;
-use crate::service::{create_files_if_absent, LoopReplace, recreated_ref_in_running};
+use crate::service::{create_files_if_absent, recreated_ref_in_running, LoopReplace};
 use anyhow::{anyhow, Result};
 
 impl CodeforcesHandler {

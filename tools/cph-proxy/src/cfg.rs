@@ -11,9 +11,9 @@ use std::{
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct Config {
-    pub listen_host: (IpAddr, u32),
-    pub to_host: Option<(IpAddr, u32)>,
-    pub to_host_proxy: Option<(IpAddr, u32)>,
+    pub listen_host: (IpAddr, u16),
+    pub to_host: Option<(IpAddr, u16)>,
+    pub to_host_proxy: Option<(IpAddr, u16)>,
     pub codeforces_project_path: PathBuf,
     pub atcoder_project_path: PathBuf,
     pub others_project_path: PathBuf,
@@ -23,6 +23,15 @@ pub struct Config {
     pub running_mode: Option<RunningMode>,
     #[serde(skip)]
     pub setted_by: ConfigSettedBy,
+    pub clipboard_proxy: Option<ClipBoardProxy>,
+}
+
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
+pub struct ClipBoardProxy {
+    pub enable: bool,
+    pub clip_board_proxy_path: PathBuf,
+    pub forward_host: (IpAddr, u16),
+    pub max_pack_bytes_size: usize,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -31,6 +40,7 @@ pub struct RunningMode {
     pub running_path: PathBuf,
     pub remove_old_linkers: bool,
 }
+
 impl Default for RunningMode {
     fn default() -> RunningMode {
         RunningMode {
@@ -74,6 +84,7 @@ impl Default for Config {
             must_self_host: false,
             running_mode: Some(RunningMode::default()),
             setted_by: ConfigSettedBy::Default,
+            clipboard_proxy: None,
         }
     }
 }
@@ -216,8 +227,12 @@ pub fn get_global_cfg() -> Config {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
+
+    pub fn set_mock_global_cfg(cfg: Config) {
+        *GLOBAL_CFG.write().unwrap() = cfg;
+    }
 
     #[test]
     fn test_parse() {

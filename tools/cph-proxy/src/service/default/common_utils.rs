@@ -1,17 +1,21 @@
+use crate::cfg::get_global_cfg;
 use anyhow::{Context, Ok, Result};
 use fs2::FileExt;
+use log::debug;
 use std::{
     io::{Read, Write},
     path::Path,
 };
 use tokio::io::AsyncWriteExt as _;
 
-use crate::cfg::{self, get_global_cfg};
-
 pub(crate) async fn create_files_if_absent<P: AsRef<Path>, T: AsRef<[u8]>>(
     mp: &[(P, T)],
 ) -> Result<()> {
     for (path, content) in mp {
+        debug!(
+            "start to create file if absent in path: {}",
+            path.as_ref().display()
+        );
         let f = tokio::fs::OpenOptions::new()
             .create_new(true)
             .write(true)
@@ -20,6 +24,10 @@ pub(crate) async fn create_files_if_absent<P: AsRef<Path>, T: AsRef<[u8]>>(
         if f.as_ref()
             .is_err_and(|e| e.kind() == std::io::ErrorKind::AlreadyExists)
         {
+            debug!(
+                "success to create file if absent in path for already_exists: {}",
+                path.as_ref().display()
+            );
             continue;
         }
         let mut f = f.with_context(|| {
@@ -35,6 +43,10 @@ pub(crate) async fn create_files_if_absent<P: AsRef<Path>, T: AsRef<[u8]>>(
             )
         })?;
         f.sync_all().await?;
+        debug!(
+            "success to create file if absent in path: {}",
+            path.as_ref().display()
+        );
     }
     Ok(())
 }
@@ -69,7 +81,7 @@ pub(crate) fn get_unknown_problem_id(lock_dir: &Path) -> anyhow::Result<u32> {
         .truncate(false)
         .write(true)
         .open(&lockfile)?;
-    for _ in 0..cfg::get_global_cfg().lock_file_max_try {
+    for _ in 0..get_global_cfg().lock_file_max_try {
         if f.try_lock_exclusive().is_ok() {
             let res = get_unknown_problem_id_within_locked(lockfile.as_path(), &mut f);
             f.unlock()?;
@@ -77,7 +89,7 @@ pub(crate) fn get_unknown_problem_id(lock_dir: &Path) -> anyhow::Result<u32> {
             return res;
         }
         std::thread::sleep(std::time::Duration::from_secs(
-            cfg::get_global_cfg().lock_file_delay_seconds,
+            get_global_cfg().lock_file_delay_seconds,
         ));
     }
     anyhow::bail!(
@@ -109,6 +121,12 @@ pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
     src_path: P,
     name: T,
 ) -> anyhow::Result<()> {
+    debug!(
+        "start to recreated_ref_in_running in src uuid: {}, path: {}, name: {}",
+        uuid.as_ref(),
+        src_path.as_ref().display(),
+        name.as_ref(),
+    );
     let cfg = get_global_cfg();
     if !cfg.is_running() {
         return Ok(());
@@ -116,6 +134,7 @@ pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
     if let Some(mode) = cfg.running_mode {
         let mut recent_running_uuid = RECENT_RUNNING_UUID.lock().await;
         if mode.remove_old_linkers && !recent_running_uuid.as_str().ne(uuid.as_ref()) {
+            debug!("start to remove old linkers");
             *recent_running_uuid = uuid.as_ref().to_owned();
             remove_old_linkers(
                 get_global_cfg()
@@ -125,8 +144,19 @@ pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
                     .as_path(),
             )
             .await?;
+            debug!("success to remove old linkers");
         }
+        debug!(
+            "start to create linkers, src:[ {} ], dest:[ {} ]",
+            src_path.as_ref().display(),
+            mode.running_path.join(name.as_ref()).display(),
+        );
         tokio::fs::symlink(src_path.as_ref(), mode.running_path.join(name.as_ref())).await?;
+        debug!(
+            "success to create linkers, src:[ {} ], dest:[ {} ]",
+            src_path.as_ref().display(),
+            mode.running_path.join(name.as_ref()).display(),
+        );
     }
     Ok(())
 }
@@ -150,4 +180,42 @@ async fn remove_old_linkers(running_path: &Path) -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use icpc_project_gen::PROJECT_DIR;
+
+    use crate::{cfg::tests::set_mock_global_cfg, model::tests::mock_problem_meta_with_test_case};
+
+    use super::*;
+
+    // TODO: move it to suite test
+    #[tokio::test]
+    async fn test_symlink() {
+        let mut mock_cfg = crate::cfg::Config::default();
+        let mock_running_dir = temp_dir::TempDir::new().unwrap();
+        let mock_cf_dir = temp_dir::TempDir::new().unwrap();
+        mock_cfg.codeforces_project_path = mock_cf_dir.path().to_owned();
+        mock_cfg.running_mode = mock_cfg.running_mode.map(|mut mode| {
+            mode.running_path = mock_running_dir.path().to_owned();
+            mode
+        });
+        set_mock_global_cfg(mock_cfg);
+        println!("path: {}", mock_running_dir.path().display());
+        let _data = mock_problem_meta_with_test_case();
+        assert_eq!(
+            recreated_ref_in_running(
+                "1234",
+                Path::new(
+                    format!("{}{}", PROJECT_DIR, "/archive/codeforces/2008/A/main.h").as_str()
+                ),
+                "a.cc",
+            )
+            .await
+            .is_ok(),
+            true
+        );
+        println!("success");
+    }
 }

@@ -30,7 +30,7 @@
         "**/target": true,
         "Template": true,
         ".config": true,
-        "**/info.toml": true,
+        // "**/info.toml": true,
         // "tools": true,
         "minify": true,
         "compare": true,
@@ -46,6 +46,9 @@
         "ENABLE_BINS": "true",
         "ENABLE_ARCHIVE": "true",
     },
+    "rust-analyzer.cargo.features": [
+        "default"
+    ],
     "rust-analyzer.cargo.extraEnv": {
         "RUST_LOG": "info",
     }

@@ -1,10 +1,16 @@
+#[cfg(feature = "clipboard_proxy")]
+pub mod clipboard_proxy;
+
 use crate::cfg::get_global_cfg;
 use crate::{service, HttpResp};
 use axum::extract::Query;
 use axum::response::IntoResponse;
 use axum::routing::{any, get};
 use axum::{body::Bytes, http::StatusCode, Router};
-use idl_gen::info::{ConfigInfo, Echo};
+use idl_gen::{
+    clipboard::Clipboard,
+    info::{ConfigInfo, Echo},
+};
 use log::*;
 use std::net::IpAddr;
 
@@ -14,11 +20,12 @@ pub fn axum_router(r: Router) -> Router {
     r.route("/", any(competitive_companion))
         .route("/echo", get(echo))
         .route("/config/local", get(local_config))
+        .route("/proxy/send_clipboard", get(send_clipboard))
 }
 
 static REQWEST_SINGLTON_CLI: std::sync::OnceLock<reqwest::Client> = std::sync::OnceLock::new();
 
-async fn proxy(ip: IpAddr, port: u32, body: Bytes) -> Result<(), (StatusCode, String)> {
+async fn proxy(ip: IpAddr, port: u16, body: Bytes) -> Result<(), (StatusCode, String)> {
     let cli = REQWEST_SINGLTON_CLI.get_or_init(|| {
         let mut clib = reqwest::Client::builder();
         if let Some((to_host_proxy_ip, to_host_proxy_port)) = get_global_cfg().to_host_proxy {
@@ -69,7 +76,7 @@ async fn competitive_companion(body: Bytes) -> Result<(), (StatusCode, String)> 
             )
         })?;
         service::store_data(data).await.map_err(|e| {
-            error!("store data failed: {}", e);
+            error!("store data failed: {:?}", e);
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 format!("json unmarshal failed: {}", e),
@@ -100,3 +107,4 @@ macro_rules! rpc2http {
 // TODO: make it with grpc-gateway: https://github.com/cloudwego/volo/issues/80
 rpc2http!(echo, EchoRequest, Query);
 rpc2http!(local_config, LocalConfigRequest, Query);
+rpc2http!(send_clipboard, SendClipboardRequest, Query);

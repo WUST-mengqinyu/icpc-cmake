@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package clipboard;
+
+import "base.proto";
+
+
+message SendClipboardRequest {
+  string file_path = 1;
+}
+
+message SendClipboardResponse {
+  base.BaseResp base_resp = 255;
+}
+
+service Clipboard {
+  rpc Send(SendClipboardRequest) returns (SendClipboardResponse) {}
+}

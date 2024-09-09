@@ -3,7 +3,8 @@ members = [
     "tools/bundle",
     "tools/cph-proxy",
     "tools/icpc-project-gen",
-    "tools/idl-gen", "tools/idl-gen-plugins",
+    "tools/idl-gen",
+    # "tools/idl-gen-plugins",
 ]
 resolver = "2"
 package.edition = "2021"

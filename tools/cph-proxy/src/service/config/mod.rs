@@ -1,6 +1,8 @@
 use idl_gen::info::*;
 use volo::FastStr;
 use volo_grpc::*;
+mod clipboard;
+pub use clipboard::*;
 
 use crate::cfg::get_global_cfg;
 pub struct EchoService;

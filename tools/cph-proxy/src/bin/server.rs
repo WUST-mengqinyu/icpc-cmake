@@ -16,6 +16,33 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind(&listen_host).await.unwrap();
 
-    axum::serve(listener, app).await.unwrap();
+    let (axum_s, tcp_s) = tokio::join!(axum::serve(listener, app), clipboard_proxy());
+    axum_s.unwrap();
+    tcp_s.unwrap();
     drop(h);
+}
+
+// FIXME: use semaphore to control accept
+#[cfg(feature = "clipboard_proxy")]
+async fn clipboard_proxy() -> anyhow::Result<()> {
+    use tokio::net::TcpListener;
+
+    match get_global_cfg().clipboard_proxy {
+        Some(x) => {
+            // let semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(10));
+            if x.enable {
+                let listener = TcpListener::bind(x.forward_host).await?;
+
+                loop {
+                    // let permit = semaphore.clone().acquire().await?;
+                    let (socket, _) = listener.accept().await?;
+                    tokio::spawn(
+                        handler::clipboard_proxy::clipboard_handler(socket), // drop(permit);
+                    );
+                }
+            }
+        }
+        None => todo!(),
+    }
+    Ok(())
 }

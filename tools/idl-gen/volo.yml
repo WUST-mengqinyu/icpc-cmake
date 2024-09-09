@@ -8,3 +8,8 @@ entries:
         path: ../idl/info.proto
         includes:
         - ../idl
+    - idl:
+        source: local
+        path: ../idl/clipboard.proto
+        includes:
+        - ../idl
