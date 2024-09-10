@@ -14,6 +14,7 @@ pub struct Config {
     pub listen_host: (IpAddr, u16),
     pub to_host: Option<(IpAddr, u16)>,
     pub to_host_proxy: Option<(IpAddr, u16)>,
+    pub project_root: PathBuf,
     pub codeforces_project_path: PathBuf,
     pub atcoder_project_path: PathBuf,
     pub others_project_path: PathBuf,
@@ -75,6 +76,7 @@ impl Default for Config {
             listen_host: (IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 10045),
             to_host: None,
             to_host_proxy: None,
+            project_root: std::path::PathBuf::from(PROJECT_DIR),
             codeforces_project_path: std::path::PathBuf::from(PROJECT_DIR)
                 .join("archive/codeforces"),
             atcoder_project_path: std::path::PathBuf::from(PROJECT_DIR).join("archive/atcoder"),
@@ -84,7 +86,13 @@ impl Default for Config {
             must_self_host: false,
             running_mode: Some(RunningMode::default()),
             setted_by: ConfigSettedBy::Default,
-            clipboard_proxy: None,
+            clipboard_proxy: Some(ClipBoardProxy {
+                enable: true,
+                clip_board_proxy_path: std::path::PathBuf::from(PROJECT_DIR)
+                    .join("bin/clipboard-proxy"),
+                forward_host: (IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 10046),
+                max_pack_bytes_size: 4 * 1024 * 1024,
+            }),
         }
     }
 }

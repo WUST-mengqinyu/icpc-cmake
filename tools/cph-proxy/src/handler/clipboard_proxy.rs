@@ -1,14 +1,13 @@
 use anyhow::{Context, Result};
 use log::*;
 use tokio::{io::AsyncReadExt, net::TcpStream};
-use wl_clipboard_rs::copy::{MimeType, Options, Source};
 
 pub async fn clipboard_handler(mut socket: TcpStream) -> Result<()> {
-    let mut len_buf = [0u8; 4];
+    let mut len_buf = [0u8; 8]; // FIXME: support 32 bit?
     let mut checksum_buf = [0u8; 4];
 
     socket.read_exact(&mut len_buf).await?;
-    let msg_len = u32::from_be_bytes(len_buf) as usize;
+    let msg_len = usize::from_be_bytes(len_buf);
 
     socket.read_exact(&mut checksum_buf).await?;
     let checksum = u32::from_be_bytes(checksum_buf);
@@ -26,11 +25,10 @@ pub async fn clipboard_handler(mut socket: TcpStream) -> Result<()> {
 
     let recv = std::str::from_utf8(msg_buf.as_ref())?;
     trace!("recv tcp: [{}]", recv);
-    wl_clipboard_rs::copy::copy(
-        Options::new(),
-        Source::Bytes(msg_buf.into_boxed_slice()),
-        MimeType::Text,
-    )
-    .with_context(|| "failed to copy to clipboard")?;
+
+    // FIXME: use https://github.com/dacap/clip to support cross platform
+    cli_clipboard::set_contents(recv.to_owned())
+        .map_err(|e| anyhow::anyhow!(e.to_string()))
+        .with_context(|| "failed to copy to clipboard")?;
     Ok(())
 }

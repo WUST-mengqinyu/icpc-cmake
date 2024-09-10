@@ -2,19 +2,21 @@
 pub mod clipboard_proxy;
 
 use crate::cfg::get_global_cfg;
-use crate::{service, HttpResp};
+use crate::service;
+use crate::HttpResp;
 use axum::extract::Query;
 use axum::response::IntoResponse;
 use axum::routing::{any, get};
 use axum::{body::Bytes, http::StatusCode, Router};
 use idl_gen::{
-    clipboard::Clipboard,
-    info::{ConfigInfo, Echo},
+    clipboard::{self, *},
+    info::{self, *},
 };
 use log::*;
 use std::net::IpAddr;
 
 static ECHO_SERVICE: service::EchoService = service::EchoService {};
+static CLIPBOARD_SERVICE: service::ClipboardService = service::ClipboardService {};
 
 pub fn axum_router(r: Router) -> Router {
     r.route("/", any(competitive_companion))
@@ -87,9 +89,9 @@ async fn competitive_companion(body: Bytes) -> Result<(), (StatusCode, String)> 
 }
 
 macro_rules! rpc2http {
-    ($i:ident, $req_tp:ident, $http_source:ident) => {
-        async fn $i($http_source(req): $http_source<idl_gen::info::$req_tp>) -> impl IntoResponse {
-            let resp = ECHO_SERVICE.$i(volo_grpc::Request::new(req)).await;
+    ($i:ident, $service:ident, $f: ident, $req_tp:path, $http_source:ident) => {
+        async fn $i($http_source(req): $http_source<$req_tp>) -> impl IntoResponse {
+            let resp = $service.$f(volo_grpc::Request::new(req)).await;
             match resp {
                 Ok(res) => match res.get_ref().base_resp.clone().map(|x| (x.code, x.msg)) {
                     None => HttpResp::Resp(res.into_inner()),
@@ -105,6 +107,18 @@ macro_rules! rpc2http {
 }
 
 // TODO: make it with grpc-gateway: https://github.com/cloudwego/volo/issues/80
-rpc2http!(echo, EchoRequest, Query);
-rpc2http!(local_config, LocalConfigRequest, Query);
-rpc2http!(send_clipboard, SendClipboardRequest, Query);
+rpc2http!(echo, ECHO_SERVICE, echo, info::EchoRequest, Query);
+rpc2http!(
+    local_config,
+    ECHO_SERVICE,
+    local_config,
+    info::LocalConfigRequest,
+    Query
+);
+rpc2http!(
+    send_clipboard,
+    CLIPBOARD_SERVICE,
+    send,
+    clipboard::SendClipboardRequest,
+    Query
+);

@@ -1,1 +1,19 @@
-../../.vscode/config.toml
+listen_host = ["0.0.0.0", 10045]
+project_root = "/home/badcw/repo/icpc-cmake"
+codeforces_project_path = "/home/badcw/repo/icpc-cmake/archive/codeforces"
+atcoder_project_path = "/home/badcw/repo/icpc-cmake/archive/atcoder"
+others_project_path = "/home/badcw/repo/icpc-cmake/archive/others"
+lock_file_delay_seconds = 2
+lock_file_max_try = 3
+must_self_host = false
+
+[running_mode]
+enable = true
+running_path = "/home/badcw/repo/icpc-cmake/bin"
+remove_old_linkers = true
+
+[clipboard_proxy]
+enable = true
+clip_board_proxy_path = "/home/badcw/repo/icpc-cmake/bin/clipboard-proxy"
+forward_host = ["0.0.0.0", 10046]
+max_pack_bytes_size = 4194304
