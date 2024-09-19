@@ -17,3 +17,4 @@ enable = true
 clip_board_proxy_path = "/home/badcw/repo/icpc-cmake/bin/clipboard-proxy"
 forward_host = ["0.0.0.0", 10046]
 max_pack_bytes_size = 4194304
+try_use_sys_cmd = true

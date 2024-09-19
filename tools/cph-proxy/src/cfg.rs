@@ -33,6 +33,8 @@ pub struct ClipBoardProxy {
     pub clip_board_proxy_path: PathBuf,
     pub forward_host: (IpAddr, u16),
     pub max_pack_bytes_size: usize,
+    pub try_use_sys_cmd: bool,
+    pub sys_cmd_path: Option<PathBuf>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -92,6 +94,8 @@ impl Default for Config {
                     .join("bin/clipboard-proxy"),
                 forward_host: (IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 10046),
                 max_pack_bytes_size: 4 * 1024 * 1024,
+                try_use_sys_cmd: true,
+                sys_cmd_path: None,
             }),
         }
     }

@@ -4,9 +4,9 @@
         {
             "label": "Copy Output File",
             "type": "shell",
-            "command": "${workspaceFolder}/copy_output.sh",
+            "command": "${workspaceFolder}/.vscode/copy_to_host.sh",
             "args": [
-                "${fileBasenameNoExtension}"
+                "${workspaceFolder}/bin_output/bin_${fileBasenameNoExtension}.cc"
             ],
             "problemMatcher": []
         }

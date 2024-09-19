@@ -51,5 +51,13 @@
     ],
     "rust-analyzer.cargo.extraEnv": {
         "RUST_LOG": "info",
-    }
+    },
+    "VsCodeTaskButtons.showCounter": true,
+    "VsCodeTaskButtons.tasks": [
+        {
+            "label": "$(notebook-delete-cell) Copy Output File",
+            "task": "Copy Output File",
+            "tooltip": "🧹Copy Output File"
+        }
+    ]
 }
