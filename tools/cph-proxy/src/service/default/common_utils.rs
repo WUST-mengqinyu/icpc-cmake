@@ -116,10 +116,10 @@ lazy_static::lazy_static! {
     static ref RECENT_RUNNING_UUID: tokio::sync::Mutex<String> = tokio::sync::Mutex::new(String::new());
 }
 
-pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
+pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>, T2: AsRef<str>>(
     uuid: T,
     src_path: P,
-    name: T,
+    name: T2,
 ) -> anyhow::Result<()> {
     debug!(
         "start to recreated_ref_in_running in src uuid: {}, path: {}, name: {}",
@@ -133,7 +133,7 @@ pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
     }
     if let Some(mode) = cfg.running_mode {
         let mut recent_running_uuid = RECENT_RUNNING_UUID.lock().await;
-        if mode.remove_old_linkers && !recent_running_uuid.as_str().ne(uuid.as_ref()) {
+        if mode.remove_old_linkers && recent_running_uuid.as_str().ne(uuid.as_ref()) {
             debug!("start to remove old linkers");
             *recent_running_uuid = uuid.as_ref().to_owned();
             remove_old_linkers(
@@ -162,11 +162,10 @@ pub async fn recreated_ref_in_running<T: AsRef<str>, P: AsRef<Path>>(
 }
 
 async fn remove_old_linkers(running_path: &Path) -> anyhow::Result<()> {
-    while let Some(v) = tokio::fs::read_dir(running_path)
-        .await?
-        .next_entry()
-        .await?
-    {
+    debug!("remove old linkers in path: {}", running_path.display());
+    let mut entries = tokio::fs::read_dir(running_path).await?;
+    while let Some(v) = entries.next_entry().await? {
+        debug!("remove old linkers scanned: {}", v.path().display());
         let meta = v.metadata().await.with_context(|| {
             format!(
                 "read file metadata in running path failed: {}",

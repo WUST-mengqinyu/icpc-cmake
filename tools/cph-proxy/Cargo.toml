@@ -33,6 +33,15 @@ normalize-path = { version = "0.2.1", optional = true }
 idl-gen = { path = "../idl-gen" }
 # idl-gen-plugins = { path = "../idl-gen-plugins" }
 icpc-project-gen = { path = "../icpc-project-gen" }
+clap = { version = "4.5.18", features = ["derive"] }
+
+[dependencies.uuid]
+version = "1.10.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
 
 [dev-dependencies]
 temp-dir = { version = "0.1.13" }

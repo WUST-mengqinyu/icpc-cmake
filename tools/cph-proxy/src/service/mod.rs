@@ -2,7 +2,7 @@ mod atc;
 mod cf;
 mod config;
 pub mod context;
-mod default;
+pub mod default;
 
 use super::model::*;
 pub use config::*;
