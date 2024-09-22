@@ -1,5 +1,0 @@
-add_executable(cf_2010_C2 test.cc)
-target_link_libraries(cf_2010_C2 GTest::gtest_main)
-include(GoogleTest)
-include_directories(${PROJECT_DIR})
-gtest_discover_tests(cf_2010_C2)
