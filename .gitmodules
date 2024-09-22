@@ -10,3 +10,6 @@
 [submodule "third_party/clip"]
 	path = third_party/clip
 	url = https://github.com/dacap/clip.git
+[submodule "archive"]
+	path = archive
+	url = git@github.com:WUST-mengqinyu/cp_archive.git
