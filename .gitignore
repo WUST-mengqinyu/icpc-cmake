@@ -33,3 +33,4 @@ bin/*.cc
 bin_output/*.cc
 tools/icpc-project-gen/src/consts.rs
 tools/idl-gen-plugins
+.config/
