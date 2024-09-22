@@ -38,6 +38,8 @@ namespace inner {
       #undef O
       #undef F
     };
+    template<int m> void _R(s_mint<m> &x) { ll _x; ::inner::IO::_R(_x); x.raw(_x % m); }
+    template<int m> void _W(const s_mint<m> &x) { ::inner::IO::_W(x.val()); }
     using modint998244353 = s_mint<998244353>;
     using modint1000000007 = s_mint<1000000007>;
   }// namespace static_mod_int

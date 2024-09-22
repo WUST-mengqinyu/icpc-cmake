@@ -11,7 +11,7 @@ pub struct BundlerContext {
 }
 
 fn get_replace_headers() -> Vec<(&'static str, &'static str)> {
-    return vec![("inner/", PROJECT_DIR), ("atcoder/", PROJECT_DIR)];
+    vec![("inner/", PROJECT_DIR), ("atcoder/", PROJECT_DIR)]
 }
 
 impl BundlerContext {
@@ -60,8 +60,8 @@ impl BundlerContext {
             panic!("`ICPC_EXECUTABLE_LIST` and `ICPC_MAIN_SOURCE` has not equal len, use `bundle help gen` to get help");
         }
         let deal_len = sources.len();
-        for i in 0..deal_len {
-            self.clear_target(execs[i])?;
+        for i in execs.iter().take(deal_len) {
+            self.clear_target(i)?;
         }
         Ok(())
     }

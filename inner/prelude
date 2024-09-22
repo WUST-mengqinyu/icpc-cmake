@@ -16,12 +16,16 @@ auto _stdin = std::freopen((PROJECT_DIR + "/data.in").c_str(), "r", stdin);
 #define ll long long
 #define ULL unsigned ll
 #define ALL(x) x.begin(), x.end()
+#define llu unsigned long long
+#define il inline
 
 namespace inner {
+
 #define TKASE      \
   int T;           \
   scanf("%d", &T); \
   for (int kase = 1; kase <= T; ++kase)
+  template<const int mod = 998244353>
   ll qp(ll a, ll n);
   ll qp(ll a, ll n, int mod);
   namespace IO {

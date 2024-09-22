@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/.vscode/copy_to_host.sh",
             "args": [
-                "${workspaceFolder}/bin_output/bin_${fileBasenameNoExtension}.cc"
+                "${workspaceFolder}/bin_output/bin_${fileBasenameNoExtension}_min.cc"
             ],
             "problemMatcher": []
         }

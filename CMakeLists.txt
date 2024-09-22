@@ -4,6 +4,8 @@ project(icpc)
 
 set(CMAKE_CXX_STANDARD 20)
 set(COMPILE_EXT true)
+
+add_definitions(-Wno-shift-op-parentheses)
 add_definitions(-Dbadcw)
 
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
@@ -32,7 +34,7 @@ if(${COMPILE_EXT})
         foreach(v ${THRID_PARTY})
             string(REGEX MATCH "${THIRD_PARTY_DIR}/.*" relative_path ${v})
             string(REGEX REPLACE "${THIRD_PARTY_DIR}/" "" dir_name ${relative_path})
-            add_subdirectory(${v})
+            add_subdirectory(${v} EXCLUDE_FROM_ALL)
             set(${dir_name}_SOURCE_DIR ${v})
         endforeach()
         # add_subdirectory(minify)

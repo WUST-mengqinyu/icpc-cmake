@@ -20,8 +20,8 @@
         "bits": true,
         "**/Cargo.lock": true,
         "atcoder": true,
-        "inner": true,
-        "tests": true,
+        // "inner": true,
+        // "tests": true,
         "LICENSE": true,
         "consts.h": true,
         "consts.h.in": true,
@@ -30,6 +30,7 @@
         "**/target": true,
         "Template": true,
         ".config": true,
+        "bin_output": true,
         // "**/info.toml": true,
         // "tools": true,
         "minify": true,
@@ -42,9 +43,10 @@
     "cmake.environment": {
         "GTEST_BRIEF": "1",
         "ENABLE_THIRD_PARTY": "true",
-        // "ENABLE_TESTING": "true",
+        "ENABLE_TESTING": "true",
         "ENABLE_BINS": "true",
         "ENABLE_ARCHIVE": "true",
+        "RUNNING_CONTEST": "abc372",
     },
     "rust-analyzer.cargo.features": [
         "default"

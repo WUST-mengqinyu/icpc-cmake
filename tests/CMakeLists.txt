@@ -14,7 +14,7 @@ function(add_gtest_executable target_name main_source)
   target_link_libraries(${target_name} GTest::gtest_main)
   include(GoogleTest)
   gtest_discover_tests(${target_name})
-endfunction(add_icpc_executable)
+endfunction()
 
 file(GLOB_RECURSE INNER_TEST_SRC_LIST ${test_sources_dir}/*.cc)
 foreach(v ${INNER_TEST_SRC_LIST})

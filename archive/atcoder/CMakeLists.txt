@@ -13,7 +13,10 @@ foreach(CONTEST_TYPE_DIR ${CONTEST_TYPE_DIRS})
                 foreach(PROBLEM_DIR ${PROBLEM_DIRS})
                     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_TYPE_DIR}/${CONTEST_DIR}/${PROBLEM_DIR}/CMakeLists.txt"
                         AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${CONTEST_TYPE_DIR}/${CONTEST_DIR}/${PROBLEM_DIR}/.cmake-ignore")
-                        add_subdirectory("${CONTEST_TYPE_DIR}/${CONTEST_DIR}/${PROBLEM_DIR}")
+                        
+                        if(NOT DEFINED ENV{RUNNING_CONTEST} OR "$ENV{RUNNING_CONTEST}" STREQUAL "${CONTEST_TYPE_DIR}${CONTEST_DIR}")
+                            add_subdirectory("${CONTEST_TYPE_DIR}/${CONTEST_DIR}/${PROBLEM_DIR}")
+                        endif()
                     endif()
                 endforeach()
             endif()
