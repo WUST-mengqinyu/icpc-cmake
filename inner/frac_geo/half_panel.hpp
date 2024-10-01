@@ -1,8 +1,8 @@
-#include "inner/geometry/basic.hpp"
+#include "inner/frac_geo/basic.hpp"
 #include "inner/prelude"// IWYU pragma: keep
 
 namespace inner {
-  namespace geo {
+  namespace frac_geo {
     // 求半平面交，逆时针返回原始 line index
     il std::vector<int> half_plane_only_ord(const std::vector<line> &l) {
       std::vector<int> idx(l.size());
@@ -28,5 +28,5 @@ namespace inner {
       for (int i = 0; i < (int) q.size(); ++i) ret.push_back(getLL(l[q[i]], l[q[(i + 1) % q.size()]]));
       return ret;
     }
-  }// namespace geo
+  }// namespace frac_geo
 }// namespace inner

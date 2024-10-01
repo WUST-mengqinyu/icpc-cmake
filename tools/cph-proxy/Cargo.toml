@@ -34,6 +34,7 @@ idl-gen = { path = "../idl-gen" }
 # idl-gen-plugins = { path = "../idl-gen-plugins" }
 icpc-project-gen = { path = "../icpc-project-gen" }
 clap = { version = "4.5.18", features = ["derive"] }
+tower-http = { version = "0.6.1", features = ["fs"] }
 
 [dependencies.uuid]
 version = "1.10.0"

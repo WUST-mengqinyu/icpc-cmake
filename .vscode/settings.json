@@ -61,5 +61,6 @@
             "task": "Copy Output File",
             "tooltip": "🧹Copy Output File"
         }
-    ]
+    ],
+    "codeverse.enableFix": false
 }

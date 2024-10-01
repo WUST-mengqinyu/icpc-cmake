@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "tools/bundle",
+    "tools/bundle", "tools/compare",
     "tools/cph-proxy",
     "tools/icpc-project-gen",
     "tools/idl-gen",

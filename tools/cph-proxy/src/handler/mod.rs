@@ -14,6 +14,7 @@ use idl_gen::{
 };
 use log::*;
 use std::net::IpAddr;
+use tower_http::services::{ServeDir, ServeFile};
 
 static ECHO_SERVICE: service::EchoService = service::EchoService {};
 static CLIPBOARD_SERVICE: service::ClipboardService = service::ClipboardService {};
@@ -23,6 +24,10 @@ pub fn axum_router(r: Router) -> Router {
         .route("/echo", get(echo))
         .route("/config/local", get(local_config))
         .route("/proxy/send_clipboard", get(send_clipboard))
+        .nest_service(
+            "/out",
+            ServeDir::new(get_global_cfg().project_root.join("bin_output")),
+        )
 }
 
 static REQWEST_SINGLTON_CLI: std::sync::OnceLock<reqwest::Client> = std::sync::OnceLock::new();
