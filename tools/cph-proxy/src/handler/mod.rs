@@ -14,7 +14,7 @@ use idl_gen::{
 };
 use log::*;
 use std::net::IpAddr;
-use tower_http::services::{ServeDir, ServeFile};
+use tower_http::services::ServeDir;
 
 static ECHO_SERVICE: service::EchoService = service::EchoService {};
 static CLIPBOARD_SERVICE: service::ClipboardService = service::ClipboardService {};

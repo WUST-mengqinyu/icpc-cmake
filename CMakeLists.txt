@@ -4,6 +4,7 @@ project(icpc)
 
 set(CMAKE_CXX_STANDARD 20)
 set(COMPILE_EXT true)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 
 add_definitions(-Wno-shift-op-parentheses)
 add_definitions(-Dbadcw)

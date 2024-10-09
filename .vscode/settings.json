@@ -43,10 +43,10 @@
     "cmake.environment": {
         "GTEST_BRIEF": "1",
         "ENABLE_THIRD_PARTY": "true",
-        "ENABLE_TESTING": "true",
+        // "ENABLE_TESTING": "true",
         "ENABLE_BINS": "true",
         "ENABLE_ARCHIVE": "true",
-        "RUNNING_CONTEST": "abc372",
+        "RUNNING_CONTEST": "abc374",
     },
     "rust-analyzer.cargo.features": [
         "default"

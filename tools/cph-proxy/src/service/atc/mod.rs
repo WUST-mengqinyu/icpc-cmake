@@ -26,7 +26,7 @@ impl std::fmt::Display for AtcoderContestType {
         f.write_str(match self {
             AtcoderContestType::ABC => "abc",
             AtcoderContestType::ARC => "arc",
-            AtcoderContestType::AGC => "arc",
+            AtcoderContestType::AGC => "agc",
             _ => "unknown",
         })
     }
@@ -91,6 +91,12 @@ impl AtcoderHandler {
 
 #[async_trait::async_trait]
 impl ProblemMetaWithTestCaseHandler for AtcoderHandler {
+    fn detecte(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<String> {
+        Ok({
+            let contest = &Self::get_context(data)?.contest_id;
+            format!("{}_{}", contest.0, contest.1)
+        })
+    }
     async fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
         let cx = Self::get_context(data).with_context(|| {
             format!("failed to get context from metadata: {}", data.url.as_str())

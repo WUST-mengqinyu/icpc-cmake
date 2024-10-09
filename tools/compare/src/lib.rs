@@ -8,11 +8,13 @@ use ratatui::{
 use std::{
     collections::{BTreeMap, HashMap, VecDeque},
     fmt::Display,
+    io::Write,
     path::{Path, PathBuf},
     sync::{mpsc, Arc, LazyLock, OnceLock, RwLock},
     thread,
     time::{Duration, Instant},
 };
+use thread_manager::ThreadManager;
 pub mod thread_manager;
 
 #[derive(Debug)]
@@ -353,6 +355,7 @@ pub struct CompareRun {
     compile_cache: Arc<RwLock<HashMap<String, std::result::Result<PathBuf, String>>>>,
     single_flight: Arc<singleflight::Group<std::result::Result<PathBuf, String>>>,
     out_cache: OnceLock<std::result::Result<std::fs::File, CompareResult>>, // reuse fd, clone when used
+    thread_manager: thread_manager::ThreadManager,
 }
 
 pub struct Worker {
@@ -475,13 +478,20 @@ impl CompareRun {
         format!("{}.correct", self.test_case_index)
     }
 
-    fn run_brute_force(&self, brute_force: PathBuf) -> std::result::Result<(), CompareResult> {
-        let mut child = std::process::Command::new(brute_force)
-            .current_dir(self.work_path.as_path())
-            .arg(self.test_case_index.to_string())
-            .stdin(std::process::Stdio::piped())
-            .stdout(std::process::Stdio::piped())
-            .spawn()
+    fn run_in_sandbox(
+        &self,
+        brute_force: PathBuf,
+        solver: PathBuf,
+    ) -> std::result::Result<(std::process::Child, std::process::Child), CompareResult> {
+        let mut bf = self
+            .thread_manager
+            .start(std::mem::replace(
+                std::process::Command::new(brute_force)
+                    .current_dir(self.work_path.as_path())
+                    .arg(self.test_case_index.to_string())
+                    .stdin(std::process::Stdio::piped()),
+                std::process::Command::new(""),
+            ))
             .map_err(|e| {
                 CompareResult::CompareResultUnexpected(
                     CompareResultUnexpected::GenRuntimeError,
@@ -489,26 +499,47 @@ impl CompareRun {
                 )
             })?;
 
-        let mut reader = self.test_case_input_file_clone()?;
-        std::io::copy(&mut reader, &mut child.stdin.as_ref().unwrap())
-            .map_err(|e| CompareResult::RE(format!("copy input to brute force failed: {e}")))?;
+        let mut reader1 = self.test_case_input_file_clone()?;
 
-        // self.test_case_solver_output_file_name()
-        child.wait().map_err(|e| {
-            CompareResult::CompareResultUnexpected(
-                CompareResultUnexpected::GenRuntimeError,
-                e.to_string(),
-            )
-        })?;
+        if let Some(mut stdin) = bf.stdin.take() {
+            // FIXME: else maybe no need stdin?
+            std::io::copy(&mut reader1, &mut stdin)
+                .map_err(|e| CompareResult::RE(format!("copy input to brute force failed: {e}")))?;
+        }
 
-        Ok(())
+        let mut reader2 = self.test_case_input_file_clone()?;
+
+        let mut solver = self
+            .thread_manager
+            .start(std::mem::replace(
+                std::process::Command::new(solver)
+                    .current_dir(self.work_path.as_path())
+                    .arg(self.test_case_index.to_string())
+                    .stdin(std::process::Stdio::piped()),
+                std::process::Command::new(""),
+            ))
+            .map_err(|e| {
+                CompareResult::CompareResultUnexpected(
+                    CompareResultUnexpected::GenRuntimeError,
+                    e.to_string(),
+                )
+            })?;
+
+        if let Some(mut stdin) = solver.stdin.take() {
+            // FIXME: else maybe no need stdin?
+            std::io::copy(&mut reader2, &mut stdin)
+                .map_err(|e| CompareResult::RE(format!("copy input to brute force failed: {e}")))?;
+        }
+
+        Ok((bf, solver))
     }
 
-    fn run_solver(&self, solver: PathBuf) -> std::result::Result<(), CompareResult> {
-        Ok(())
-    }
-
-    fn compare(&self, checker: PathBuf) -> std::result::Result<CompareResult, CompareResult> {
+    fn compare(
+        &self,
+        checker: PathBuf,
+        bf_out: &[u8],
+        solver_out: &[u8],
+    ) -> std::result::Result<CompareResult, CompareResult> {
         todo!()
     }
 
@@ -534,13 +565,38 @@ impl CompareRun {
 
         self.do_with_stage(worker_id, tx, Stage::GenInput, || self.gen(gen))?;
 
-        self.do_with_stage(worker_id, tx, Stage::RunBruteforce, || {
-            self.run_brute_force(brute_force)
-        })?;
+        let (bf, solver) = self.run_in_sandbox(brute_force, solver)?;
 
-        self.do_with_stage(worker_id, tx, Stage::RunSolver, || self.run_solver(solver))?;
+        let id = self.id;
+        let tx1 = tx.clone();
 
-        self.do_with_stage(worker_id, tx, Stage::RunChecker, || self.compare(checker))
+        let bf_out = std::thread::spawn(move || -> std::result::Result<Vec<u8>, CompareResult> {
+            let out = bf.wait_with_output().map_err(|e| {
+                CompareResult::CompareResultUnexpected(
+                    CompareResultUnexpected::GenRuntimeError,
+                    e.to_string(),
+                )
+            })?;
+            let _ = tx1.send(Event::CompareUpdate(worker_id, id, Stage::RunBruteforce));
+            Ok(out.stdout)
+        })
+        .join()
+        .unwrap()?;
+
+        let solver_out = solver
+            .wait_with_output()
+            .map_err(|e| {
+                CompareResult::CompareResultUnexpected(
+                    CompareResultUnexpected::GenRuntimeError,
+                    e.to_string(),
+                )
+            })?
+            .stdout;
+        let _ = tx.send(Event::CompareUpdate(worker_id, id, Stage::RunBruteforce));
+
+        self.do_with_stage(worker_id, tx, Stage::RunChecker, || {
+            self.compare(checker, &bf_out, &solver_out)
+        })
     }
 }
 
@@ -572,6 +628,7 @@ pub fn compares(cmd: Cmd) -> CompareRuns {
     let solver = Arc::new(cmd.solver);
     let gen = Arc::new(cmd.gen);
     let checker = Arc::new(cmd.checker);
+    let thread_manager = thread_manager::ThreadManager::new(Some(4)); // TODO: config
 
     let pending = (0..cmd.times)
         .map(|id| CompareRun {
@@ -585,6 +642,7 @@ pub fn compares(cmd: Cmd) -> CompareRuns {
             compile_cache: compile_cache.clone(),
             single_flight: single_flight.clone(),
             out_cache: OnceLock::new(),
+            thread_manager: thread_manager.clone(),
         })
         .collect();
     CompareRuns {

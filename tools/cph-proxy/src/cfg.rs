@@ -22,9 +22,10 @@ pub struct Config {
     pub lock_file_max_try: u64,
     pub must_self_host: bool,
     pub running_mode: Option<RunningMode>,
+    pub clipboard_proxy: Option<ClipBoardProxy>,
+    pub in_vscode_project: bool,
     #[serde(skip)]
     pub setted_by: ConfigSettedBy,
-    pub clipboard_proxy: Option<ClipBoardProxy>,
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -87,7 +88,6 @@ impl Default for Config {
             lock_file_max_try: 3,
             must_self_host: false,
             running_mode: Some(RunningMode::default()),
-            setted_by: ConfigSettedBy::Default,
             clipboard_proxy: Some(ClipBoardProxy {
                 enable: true,
                 clip_board_proxy_path: std::path::PathBuf::from(PROJECT_DIR)
@@ -97,6 +97,8 @@ impl Default for Config {
                 try_use_sys_cmd: true,
                 sys_cmd_path: None,
             }),
+            in_vscode_project: true,
+            setted_by: ConfigSettedBy::Default,
         }
     }
 }

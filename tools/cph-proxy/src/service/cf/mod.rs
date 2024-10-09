@@ -4,7 +4,6 @@ use crate::{cfg, model::*, service::context};
 use anyhow::Context;
 use log::*;
 use std::sync::Arc;
-
 mod cmake_gen;
 
 pub struct CodeforcesHandler {}
@@ -53,6 +52,12 @@ impl CodeforcesHandler {
 
 #[async_trait::async_trait]
 impl ProblemMetaWithTestCaseHandler for CodeforcesHandler {
+    fn detecte(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<String> {
+        Ok({
+            let contest = &Self::get_context(data)?.contest_id;
+            format!("cf_{}", contest)
+        })
+    }
     async fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()> {
         let cx = Self::get_context(data).with_context(|| {
             format!("failed to get context from metadata: {}", data.url.as_str())

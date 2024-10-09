@@ -4,6 +4,8 @@ mod config;
 pub mod context;
 pub mod default;
 
+use crate::cfg::get_global_cfg;
+
 use super::model::*;
 pub use config::*;
 pub use default::common_utils::*;
@@ -53,18 +55,23 @@ impl CompetitvePlatform {
         )
     }
 
-    fn dispatch(&self) -> &dyn ProblemMetaWithTestCaseHandler {
-        match self {
-            CompetitvePlatform::Codeforces => &cf::CodeforcesHandler {},
-            CompetitvePlatform::Atcoder => &atc::AtcoderHandler {},
-            CompetitvePlatform::Unknown(_) => &default::DefaultHandler {},
+    fn dispatch(&self) -> Box<dyn ProblemMetaWithTestCaseHandler> {
+        let mut res: Box<dyn ProblemMetaWithTestCaseHandler> = match self {
+            CompetitvePlatform::Codeforces => Box::new(cf::CodeforcesHandler {}),
+            CompetitvePlatform::Atcoder => Box::new(atc::AtcoderHandler {}),
+            CompetitvePlatform::Unknown(_) => Box::new(default::DefaultHandler {}),
+        };
+        if get_global_cfg().in_vscode_project {
+            res = Box::new(default::vscode_middleware::VscodeAdapter::new(res));
         }
+        res
     }
 }
 
 #[async_trait::async_trait]
-trait ProblemMetaWithTestCaseHandler: Send + Sync {
+pub trait ProblemMetaWithTestCaseHandler: Send + Sync {
     async fn handle(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<()>;
+    fn detecte(&self, data: &ProblemMetaWithTestCase) -> anyhow::Result<String>;
 }
 
 #[cfg(test)]

@@ -65,6 +65,7 @@ namespace inner {
       int getP() const { return sign(y) == 1 || (sign(y) == 0 && sign(x) == -1); }
     };
     il void _R(point &x) { x.scan(); }
+    il void _W(const db &x) { printf("%.11Lf", x); }
     il void _W(const point &x) { x.print(); }
     il int inmid(point k1, point k2, point k3) { return inmid(k1.x, k2.x, k3.x) && inmid(k1.y, k2.y, k3.y); }
     il db cross(point k1, point k2) { return k1.x * k2.y - k1.y * k2.x; }

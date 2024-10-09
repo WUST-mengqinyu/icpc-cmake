@@ -11,6 +11,7 @@ void test_io(const std::string testCase, const std::string &inputPath, const std
     freopen(inputPath.c_str(), "r", stdin);
     freopen(ansPath.c_str(), "w", stdout);
     solve();
+    std::fflush(stdout);
     freopen("/dev/tty", "a", stdout);
     _exit(0);
   } else {
