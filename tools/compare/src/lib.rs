@@ -1,3 +1,5 @@
+mod checker;
+
 use anyhow::{anyhow, bail, Context, Result};
 use cph_proxy::cfg::*;
 use ratatui::{
@@ -534,13 +536,16 @@ impl CompareRun {
         Ok((bf, solver))
     }
 
-    fn compare(
+    fn compare<C>(
         &self,
-        checker: PathBuf,
+        checker: C,
         bf_out: &[u8],
         solver_out: &[u8],
-    ) -> std::result::Result<CompareResult, CompareResult> {
-        todo!()
+    ) -> CompareResult
+    where
+        C: checker::Checker,
+    {
+        checker.check(bf_out, solver_out)
     }
 
     fn do_with_stage<R, F: FnOnce() -> R>(
@@ -593,6 +598,29 @@ impl CompareRun {
             })?
             .stdout;
         let _ = tx.send(Event::CompareUpdate(worker_id, id, Stage::RunBruteforce));
+
+        std::fs::write(
+            self.work_path
+                .join(self.test_case_brute_force_output_file_name()),
+            &bf_out,
+        )
+        .map_err(|e| {
+            CompareResult::CompareResultUnexpected(
+                CompareResultUnexpected::GenOutputError,
+                e.to_string(),
+            )
+        })?;
+        std::fs::write(
+            self.work_path
+                .join(self.test_case_solver_output_file_name()),
+            &solver_out,
+        )
+        .map_err(|e| {
+            CompareResult::CompareResultUnexpected(
+                CompareResultUnexpected::GenOutputError,
+                e.to_string(),
+            )
+        })?;
 
         self.do_with_stage(worker_id, tx, Stage::RunChecker, || {
             self.compare(checker, &bf_out, &solver_out)
